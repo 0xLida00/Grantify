@@ -50,15 +50,17 @@ To modularize the project, following Django apps will be created:
    - User Roles: Admin, Organization Representative, Evaluator, Applicant.
    - Features: Secure password hashing, Profile management, Role-specific dashboards
 
-2. **`calls_app`** (Grant Calls App )
+2. **`calls_app`** (Grant Calls App)
    - Purpose: Allow organizations to create, update, and publish grant calls.
-   - Feature 1: Form for entering grant details (title, description, deadline, eligibility, budget)
-   - Feature 2: Call status management (draft, open, closed)
+   - Features: 
+        - Form for entering grant details (title, description, deadline, eligibility, budget)
+        - Call status management (draft, open, closed)
 
 3. **`proposals_app`** (Proposal Submission App)
    - Purpose: Enable applicants to submit proposals.
-   - Feature 1: Detailed proposal form with file uploads (documents, supporting evidence)
-   - Feature 2: Status tracking (submitted, under review, feedback provided, accepted/rejected)
+   - Features:
+        - Detailed proposal form with file uploads (documents, supporting evidence)
+        - Status tracking (submitted, under review, feedback provided, accepted/rejected)
 
 4. **`evaluation_app`** (Evaluation & Workflow App)
    - Purpose: Support evaluators in reviewing and scoring proposals.
@@ -70,15 +72,37 @@ To modularize the project, following Django apps will be created:
    - Workflow Management:
         - Admin controls to move proposals through different stages (from submission to evaluation to final decision)
 
-5. **`messaging`** (Handles private user messaging)
-   - Models: `Message`
-   - Views: Inbox, Outbox, Compose message
-   - Templates: Messaging interface
+5. **`reports_app`** (Reporting & Analytics App)
+   - Purpose: Provide insights into the grant process.
+   - Features: 
+        - Dashboards and reports for overall grant performance
+        - Metrics on submissions, evaluation scores, and post-award project progress
+   - Integration: Optionally integrate external APIs (e.g., for email notifications or document verification) to enhance functionality.
 
-6. **`admin_panel`** (For administrative management and analytics)
-   - Models: None (Uses Django admin)
-   - Templates: Dashboard UI
+6. **`alerts_app`** (Notifications & Communication App)
+   - Purpose: Manage email/SMS notifications, in-app messaging, or alerts to keep all users informed about status changes and updates.
+   - Features:
+        - Email Notifications – Automatically send emails when key actions occur (e.g., proposal submission, grant call publication).
+        - SMS Alerts – Optionally provide SMS notifications for urgent updates.
+        - In-App Messaging – Display real-time alerts and notifications within the user dashboard.
+        - Push Notifications – Support mobile or web-based push alerts for a more interactive experience.
+        - Notification Preferences – Allow users to customize notification settings such as frequency and delivery channels.
 
-7. **`frontend`** (For UI presentation using HTML, CSS, and JS)
-   - Static files: CSS, JS, Images
-   - Templates: Base templates and homepage
+7. **`audit_app`** (Audit & Logging App)
+   - Purpose: Track user activities, changes, and critical system events for compliance, security, and troubleshooting in a multi-user environment.
+   - Features:
+        - User Activity Logging – Record actions like logins, data modifications, and key transactions.
+        - Change Tracking – Maintain an audit trail of modifications to important data such as grant call details or proposal statuses.
+        - System Events – Log errors, warnings, and significant system events to aid in troubleshooting and performance monitoring.
+        - Secure Log Storage – Ensure logs are stored securely with access limited to authorized personnel.
+        - Reporting Interface – Provide an admin dashboard for reviewing, filtering, and generating reports on logged events.
+
+8. **`support_app`** (Help & Support/Feedback App)
+   - Purpose: Offer a system for users to raise support tickets, provide feedback, and access self-help resources like FAQs, thereby improving overall user experience.
+   - Features:
+        - Support Ticket System – Enable users to create and track support requests for any issues encountered.
+        - Feedback Forms – Allow users to submit suggestions, report bugs, or offer general feedback.
+        - FAQ Section – Provide a searchable repository of frequently asked questions and troubleshooting tips.
+        - Ticket Status Updates – Keep users informed about the progress and resolution of their support tickets.
+        - Admin Interface – Include a management console for support staff to review, categorize, and resolve tickets efficiently.
+        - Live Chat (Optional) – Consider integrating a real-time chat feature for immediate support if needed.
