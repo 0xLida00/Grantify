@@ -19,7 +19,7 @@ Grantify is a comprehensive grant management platform designed to streamline the
 
 ---
 
-### 2. Appicant
+### 2. Applicant
 *As an applicant, I want to submit my proposal and track its progress so that I stay informed about the evaluation process and can receive feedback for improvement.*
 
 #### Acceptance Criteria
@@ -50,20 +50,25 @@ To modularize the project, following Django apps will be created:
    - User Roles: Admin, Organization Representative, Evaluator, Applicant.
    - Features: Secure password hashing, Profile management, Role-specific dashboards
 
-2. **`polls`** (Manages polls, choices, and votes)
-   - Models: `Poll`, `Choice`, `Vote`
-   - Views: Poll creation, voting, results
-   - Templates: Poll creation form, results display
+2. **`calls_app`** (Grant Calls App )
+   - Purpose: Allow organizations to create, update, and publish grant calls.
+   - Feature 1: Form for entering grant details (title, description, deadline, eligibility, budget)
+   - Feature 2: Call status management (draft, open, closed)
 
-3. **`comments`** (Handles comments on polls)
-   - Models: `Comment`
-   - Views: Add/Edit/Delete comment
-   - Templates: Comment sections on polls
+3. **`proposals_app`** (Proposal Submission App)
+   - Purpose: Enable applicants to submit proposals.
+   - Feature 1: Detailed proposal form with file uploads (documents, supporting evidence)
+   - Feature 2: Status tracking (submitted, under review, feedback provided, accepted/rejected)
 
-4. **`notifications`** (Manages user notifications)
-   - Models: `Notification`
-   - Views: Notifications list, mark as read
-   - Templates: Notification dropdown/list
+4. **`evaluation_app`** (Evaluation & Workflow App)
+   - Purpose: Support evaluators in reviewing and scoring proposals.
+   - Features: 
+        - Assignment of proposals to evaluators
+        - Scoring system with automated calculations
+        - Comment and feedback mechanism
+        - Preselection and final selection workflows
+   - Workflow Management:
+        - Admin controls to move proposals through different stages (from submission to evaluation to final decision)
 
 5. **`messaging`** (Handles private user messaging)
    - Models: `Message`
