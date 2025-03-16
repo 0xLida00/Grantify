@@ -46,7 +46,15 @@ INSTALLED_APPS = [
     'audit_app',
     'support_app',
     'frontend',
+    'crispy_forms',
+    'crispy_bootstrap4',
+
+    # Third-party apps
+    'rest_framework',
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap4")
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

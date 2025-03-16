@@ -38,7 +38,6 @@ class CustomUser(AbstractUser):
         """Return profile picture URL or default image."""
         if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
             return self.profile_picture.url
-        from django.conf import settings
         return f"{settings.MEDIA_URL}profile_pics/default.png"
 
     def save(self, *args, **kwargs):
@@ -47,7 +46,6 @@ class CustomUser(AbstractUser):
         if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
             try:
                 img_path = self.profile_picture.path
-                from PIL import Image
                 with Image.open(img_path) as img:
                     if img.height > 300 or img.width > 300:
                         img.thumbnail((300, 300))
