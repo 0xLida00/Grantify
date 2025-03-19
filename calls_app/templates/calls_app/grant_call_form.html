@@ -1,0 +1,31 @@
+<!-- grant_call_form.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>{% if grant_call %}Edit Grant Call{% else %}Create Grant Call{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <h4>Questions</h4>
+        {{ question_formset.management_form }}
+        <div id="questions-container">
+            {% for form in question_formset %}
+            <div class="card mb-3 question-form">
+                <div class="card-body">
+                    {{ form.as_p }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-success" id="add-question">Add Question</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'grant_call_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+    <br>
+    <br>
+</div>
+{% endblock %}

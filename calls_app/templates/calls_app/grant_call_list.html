@@ -1,0 +1,28 @@
+<!-- grant_call_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Available Grant Calls</h2>
+        {% if user.is_staff %}
+        <a href="{% url 'grant_call_create' %}" class="btn btn-primary">Create New Grant Call</a>
+        {% endif %}
+    </div>
+
+    <ul class="list-group">
+        {% for grant_call in grant_calls %}
+        <li class="list-group-item">
+            <div>
+                <h5><a href="{% url 'grant_call_detail' grant_call.pk %}">{{ grant_call.title }}</a></h5>
+                <p class="text-muted">{{ grant_call.description|truncatewords:20 }}</p>
+                <small class="text-muted">Deadline: {{ grant_call.deadline }}</small>
+            </div>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center">No grant calls available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

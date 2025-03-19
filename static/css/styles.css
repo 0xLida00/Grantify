@@ -1,61 +1,131 @@
-/* Custom styles for Grantify base template */
+/* Ensure html and body take full height */
+html, body {
+  height: 100%;
+}
+
+/* Header and Navbar Styling */
+header {
+  padding: 4px 0;
+  position: sticky;
+  top: 10px;
+  z-index: 100;
+}
+
+.bell-icon {
+  font-size: 1rem;
+  margin-right: 2px;
+  margin-top: 5px;
+  margin-left: -15px;
+}
+
+.notification-badge {
+  font-size: 0.8rem;
+  color: yellow;
+}
+
+.navbar {
+  box-shadow: none;
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+}
+
+.navbar .nav-link {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-left: 18px;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+  color: #527ad2 !important;
+}
+
+/* Base styling for body with flex column layout */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Wrapper layout */
-  #wrapper {
-    display: flex;
-    width: 100%;
-    align-items: stretch;
-  }
-  
-  /* Sidebar styles */
-  #sidebar-wrapper {
-    position: fixed; /* Fix sidebar on the left */
-    top: 0;
-    left: 0;
-    bottom: 0;
-    min-width: 250px;
-    max-width: 250px;
-    background-color: #f8f9fa;
-    border-right: 1px solid #dee2e6;
-    z-index: 1000; /* Ensure it stays behind header if needed */
-  }
-  
-  #sidebar-wrapper .sidebar-heading {
-    padding: 1rem;
-    font-size: 1.25rem;
-    font-weight: bold;
-    background-color: #343a40;
-    color: #fff;
-    text-align: center;
-  }
-  
-  #sidebar-wrapper .list-group-item {
-    border: none;
-    padding: 1rem 1.5rem;
-  }
-  
-  #sidebar-wrapper .list-group-item:hover {
-    background-color: #e9ecef;
-  }
-  
-  /* Page content styles */
-  #page-content-wrapper {
-    margin-left: 250px;  /* Push content to the right of the fixed sidebar */
-    width: calc(100% - 250px);
-    padding: 0; /* Adjust as needed */
-  }
-  
-  /* Toggled state for sidebar (if using JS to hide sidebar) */
-  #wrapper.toggled #sidebar-wrapper {
-    margin-left: -250px;
-  }
-  
-  #wrapper.toggled #page-content-wrapper {
-    margin-left: 0;
-    width: 100%;
-  }
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Main wrapper: allow it to grow and push footer down */
+#wrapper {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  align-items: stretch;
+}
+
+/* Sidebar styles */
+#sidebar-wrapper {
+  position: fixed; /* Fix sidebar on the left */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  min-width: 250px;
+  max-width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  z-index: 1000;
+}
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 1rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  background-color: #343a40;
+  color: #fff;
+  text-align: center;
+}
+
+#sidebar-wrapper .list-group-item {
+  border: none;
+  padding: 1rem 1.5rem;
+}
+
+#sidebar-wrapper .list-group-item:hover {
+  background-color: #e9ecef;
+}
+
+/* Page content styles */
+#page-content-wrapper {
+  margin-left: 250px;  /* Push content to the right of the fixed sidebar */
+  width: calc(100% - 250px);
+  padding: 0;
+}
+
+/* Toggled state for sidebar (if using JS to hide sidebar) */
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: -250px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+  margin-left: 130px;
+  width: 100%;
+}
+
+/* Footer Styling - Sticky Footer */
+footer.footer {
+  background-color: #343a40; /* Blue/Gray theme can be adjusted */
+  padding: 10px 0;
+  color: white;
+  width: 100%;
+  text-align: center;
+  z-index: 100;
+  margin-top: auto;  /* Push footer to the bottom */
+}
+
+footer.footer .list-inline-item a {
+  font-size: 1.2rem;
+  margin: 0 10px;
+  transition: color 0.3s ease-in-out;
+}
+
+footer.footer .list-inline-item a:hover {
+  color: #FFD700;
+}

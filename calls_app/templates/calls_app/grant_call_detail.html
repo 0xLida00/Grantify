@@ -1,0 +1,65 @@
+<!-- grant_call_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{{ grant_call.title }}</h2>
+
+    <!-- Grant Call Details -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Grant Details</h5>
+            <p><strong>Description:</strong> {{ grant_call.description }}</p>
+            <p><strong>Deadline:</strong> {{ grant_call.deadline }}</p>
+            <p><strong>Eligibility:</strong></p>
+            <ol>
+                {% for criterion in grant_call.eligibility.splitlines %}
+                <li>{{ criterion }}</li>
+                {% endfor %}
+            </ol>
+            <p><strong>Budget:</strong> ${{ grant_call.budget }}</p>
+            <p><strong>Status:</strong> 
+                <span class="badge 
+                    {% if grant_call.status == 'open' %}badge-success
+                    {% elif grant_call.status == 'closed' %}badge-danger
+                    {% else %}badge-secondary{% endif %}">
+                    {{ grant_call.get_status_display }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Questions Section -->
+    {% if grant_call.questions.exists %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Questions</h5>
+            <ul class="list-group">
+                {% for question in grant_call.questions.all %}
+                <li class="list-group-item">
+                    <strong>{{ question.question_text }}</strong>
+                    {% if question.choices.exists %}
+                    <ul class="mt-2">
+                        {% for choice in question.choices.all %}
+                        <li>{{ choice.choice_text }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No questions have been added to this grant call yet.</div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'grant_call_update' grant_call.pk %}" class="btn btn-warning mx-3">Edit</a>
+        <a href="{% url 'grant_call_delete' grant_call.pk %}" class="btn btn-danger mx-3">Delete</a>
+        <a href="{% url 'grant_call_list' %}" class="btn btn-secondary mx-3">Back</a>
+    </div>
+</div>
+{% endblock %}
