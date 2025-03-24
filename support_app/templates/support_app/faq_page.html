@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQs{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Frequently Asked Questions</h1>
+    <ul class="list-group">
+        {% for faq in faqs %}
+        <li class="list-group-item">
+            <h5>{{ faq.question }}</h5>
+            <p>{{ faq.answer }}</p>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center">No FAQs available at the moment.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

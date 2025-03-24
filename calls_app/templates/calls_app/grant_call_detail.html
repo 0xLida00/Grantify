@@ -57,9 +57,16 @@
 
     <!-- Action Buttons -->
     <div class="d-flex justify-content-center">
-        <a href="{% url 'grant_call_update' grant_call.pk %}" class="btn btn-warning mx-3">Edit</a>
-        <a href="{% url 'grant_call_delete' grant_call.pk %}" class="btn btn-danger mx-3">Delete</a>
-        <a href="{% url 'grant_call_list' %}" class="btn btn-secondary mx-3">Back</a>
+        {% if user.is_authenticated %}
+            {% if user.role == 'applicant' and grant_call.status == 'open' %}
+            <a href="{% url 'apply_grant_call' grant_call.pk %}" class="btn btn-success mx-2">Apply</a>
+            {% endif %}
+            {% if user.role == 'admin' or user.role == 'org' %}
+            <a href="{% url 'grant_call_update' grant_call.pk %}" class="btn btn-warning mx-2">Edit</a>
+            <a href="{% url 'grant_call_delete' grant_call.pk %}" class="btn btn-danger mx-2">Delete</a>
+            {% endif %}
+        {% endif %}
+        <a href="{% url 'grant_call_list' %}" class="btn btn-secondary mx-2">Back</a>
     </div>
 </div>
 {% endblock %}

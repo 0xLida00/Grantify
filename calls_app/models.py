@@ -18,6 +18,8 @@ class GrantCall(models.Model):
     modified_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="modified_grant_calls")
     modified_at = models.DateTimeField(auto_now=True)
 
+    favorited_by = models.ManyToManyField(CustomUser, related_name="favorite_grants", blank=True)
+
     def __str__(self):
         return self.title
 

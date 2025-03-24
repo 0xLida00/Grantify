@@ -34,8 +34,7 @@ header {
 
 .navbar .nav-link {
   font-size: 1.1rem;
-  font-weight: bold;
-  margin-left: 18px;
+  margin-left: 10px;
   transition: color 0.3s ease-in-out;
 }
 
@@ -128,4 +127,71 @@ footer.footer .list-inline-item a {
 
 footer.footer .list-inline-item a:hover {
   color: #FFD700;
+}
+
+/* Floating Support Icon */
+.support-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff5722; /* Bright orange for visibility */
+  color: white;
+  border-radius: 50%;
+  width: 60px; /* Slightly larger for better visibility */
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow for contrast */
+  z-index: 1000;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.support-icon:hover {
+  transform: scale(1.1); /* Slight zoom effect on hover */
+  background-color: #e64a19; /* Darker orange on hover */
+}
+
+.support-icon i {
+  font-size: 24px; /* Larger icon size */
+}
+
+/* Support Modal */
+.support-modal {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  padding: 20px;
+  z-index: 1001;
+}
+
+.support-modal-content {
+  position: relative;
+}
+
+.support-modal .close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+}
+
+.support-modal h5 {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: black;
+}
+
+.support-modal form button {
+  margin-top: 10px;
+  width: 100%;
 }

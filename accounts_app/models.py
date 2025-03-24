@@ -16,7 +16,6 @@ class CustomUser(AbstractUser):
     bio = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
-    # Override groups field with a unique related_name
     groups = models.ManyToManyField(
         'auth.Group',
         blank=True,
@@ -24,7 +23,6 @@ class CustomUser(AbstractUser):
         help_text='The groups this user belongs to.',
     )
 
-    # Override user_permissions field with a unique related_name
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         blank=True,

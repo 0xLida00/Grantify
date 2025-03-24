@@ -18,13 +18,13 @@ class AccountsAppTests(TestCase):
             role='applicant'
         )
 
-    # 1. Test GET request for signup page
+    # Test GET request for signup page
     def test_signup_get(self):
         response = self.client.get(self.signup_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts_app/signup.html')
 
-    # 2. Test POST request for valid signup
+    # Test POST request for valid signup
     def test_signup_post_valid(self):
         data = {
             'username': 'newuser',
@@ -38,7 +38,7 @@ class AccountsAppTests(TestCase):
         self.assertTrue(user_model.objects.filter(username='newuser').exists())
         self.assertRedirects(response, reverse('home'))
 
-    # 3. Test POST request for invalid signup (password mismatch)
+    # Test POST request for invalid signup (password mismatch)
     def test_signup_post_invalid(self):
         data = {
             'username': 'newuser',
@@ -51,13 +51,13 @@ class AccountsAppTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(CustomUser.objects.filter(username='newuser').exists())
 
-    # 4. Test GET request for login page
+    # Test GET request for login page
     def test_login_get(self):
         response = self.client.get(self.login_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts_app/login.html')
 
-    # 5. Test POST request for valid login
+    # Test POST request for valid login
     def test_login_post_valid(self):
         data = {
             'username': 'testuser',
@@ -66,7 +66,7 @@ class AccountsAppTests(TestCase):
         response = self.client.post(self.login_url, data)
         self.assertRedirects(response, reverse('home'))
 
-    # 6. Test POST request for invalid login
+    # Test POST request for invalid login
     def test_login_post_invalid(self):
         data = {
             'username': 'testuser',
@@ -76,20 +76,20 @@ class AccountsAppTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Invalid username or password.")
 
-    # 7. Test logout functionality
+    # Test logout functionality
     def test_logout(self):
         self.client.login(username='testuser', password='TestPassword123')
         response = self.client.get(self.logout_url)
         self.assertRedirects(response, reverse('home'))
 
-    # 8. Test profile page access for logged-in user
+    # Test profile page access for logged-in user
     def test_profile_access(self):
         self.client.login(username='testuser', password='TestPassword123')
         response = self.client.get(self.profile_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts_app/profile.html')
 
-    # 9. Test unauthorized access to another user's profile
+    # Test unauthorized access to another user's profile
     def test_profile_unauthorized_access(self):
         other_user = CustomUser.objects.create_user(
             username='otheruser',
@@ -105,7 +105,7 @@ class AccountsAppTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('home'))
     
-    # 10. Test password change functionality
+    # Test password change functionality
     def test_password_change(self):
         self.client.login(username='testuser', password='TestPassword123')
         data = {

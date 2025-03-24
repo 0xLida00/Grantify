@@ -36,7 +36,6 @@ class GrantChoiceForm(forms.ModelForm):
         }
 
 
-# Formset for adding multiple questions
 GrantQuestionFormSet = inlineformset_factory(
     GrantCall,
     GrantQuestion,

@@ -80,6 +80,11 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ml-auto">
                         {% if user.is_authenticated %}
+                            {% if user.role == 'applicant' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'favorite_grant_calls' %}">Favorites</a>
+                            </li>
+                            {% endif %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'profile' user.username %}">Profile</a>
                             </li>
@@ -185,12 +190,52 @@
         </div>
     </footer>
 
+    <!-- Floating Support Icon -->
+    <div id="support-icon" class="support-icon">
+        <i class="fas fa-life-ring"></i>
+    </div>
+
+    <!-- Support Center Modal -->
+    <div id="support-modal" class="support-modal">
+        <div class="support-modal-content">
+            <span class="close">&times;</span>
+            <h4>Support Center</h4>
+
+            <!-- FAQs Page -->
+            <div id="faq-section">
+                <h5><a href="{% url 'faq_page' %}" target="_blank">FAQs</a></h5>
+            </div>
+
+            <!-- Support Ticket Form -->
+            <div id="support-ticket-section">
+                <h5>Create a Support Ticket</h5>
+                <form id="support-ticket-form" method="post" action="{% url 'support_ticket_create' %}">
+                    {% csrf_token %}
+                    <input type="text" id="ticket-subject" name="subject" placeholder="Enter the subject of your issue" class="form-control" required>
+                    <textarea id="ticket-description" name="description" placeholder="Describe your issue in detail" class="form-control" rows="4" required></textarea>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+
+            <!-- Feedback Form -->
+            <div id="feedback-section">
+                <h5>Submit Feedback</h5>
+                <form id="feedback-form" method="post" action="{% url 'feedback_create' %}">
+                    {% csrf_token %}
+                    <textarea id="feedback-message" name="message" placeholder="Write your feedback here" class="form-control" rows="4" required></textarea>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>
-    <script src="{% static 'js/grant_call.js' %}"></script>
     <script src="{% static 'js/grant_call_form.js' %}"></script>
+    <script src="{% static 'js/grant_call_favorites.js' %}"></script>
+    <script src="{% static 'js/support.js' %}"></script>
 </body>
 </html>

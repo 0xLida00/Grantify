@@ -11,14 +11,26 @@
         {% endif %}
     </div>
 
+    <!-- Include CSRF token -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
     <ul class="list-group">
         {% for grant_call in grant_calls %}
-        <li class="list-group-item">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
                 <h5><a href="{% url 'grant_call_detail' grant_call.pk %}">{{ grant_call.title }}</a></h5>
                 <p class="text-muted">{{ grant_call.description|truncatewords:20 }}</p>
                 <small class="text-muted">Deadline: {{ grant_call.deadline }}</small>
             </div>
+            {% if user.is_authenticated and user.role == 'applicant' %}
+            <button class="btn btn-link favorite-toggle" data-grant-id="{{ grant_call.pk }}">
+                {% if user in grant_call.favorited_by.all %}
+                <i class="fas fa-heart text-danger"></i> <!-- Filled heart for favorited -->
+                {% else %}
+                <i class="far fa-heart text-muted"></i> <!-- Empty heart for not favorited -->
+                {% endif %}
+            </button>
+            {% endif %}
         </li>
         {% empty %}
         <li class="list-group-item text-center">No grant calls available.</li>
