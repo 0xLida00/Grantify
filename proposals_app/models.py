@@ -1,10 +1,10 @@
-# proposals_app/models.py
 from django.db import models
 from accounts_app.models import CustomUser
 from calls_app.models import GrantCall
 
 class Proposal(models.Model):
     STATUS_CHOICES = (
+        ('draft', 'Draft'),
         ('submitted', 'Submitted'),
         ('under_review', 'Under Review'),
         ('feedback', 'Feedback Provided'),

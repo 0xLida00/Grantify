@@ -1,7 +1,6 @@
-import openai
+import openai, json, time
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,9 +10,11 @@ from .models import FAQ, SupportTicket, Feedback
 from .serializers import FAQSerializer, SupportTicketSerializer, FeedbackSerializer
 from .forms import SupportTicketForm, FeedbackForm
 from django.views.generic import ListView
+from decouple import config
 
-openai.api_key = "your_openai_api_key"
+openai.api_key = config("OPENAI_API_KEY")
 
+# OpenAI Chatbot View
 @csrf_exempt
 def chatbot(request):
     if request.method == "POST":
@@ -21,20 +22,30 @@ def chatbot(request):
             data = json.loads(request.body)
             user_message = data.get("message", "")
 
-            # Send the user message to OpenAI API
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": user_message},
-                ],
-            )
+            # Retry logic for rate limits
+            for _ in range(3):  # Retry up to 3 times
+                try:
+                    response = openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": "You are a helpful assistant."},
+                            {"role": "user", "content": user_message},
+                        ],
+                    )
+                    chatbot_message = response["choices"][0]["message"]["content"]
+                    return JsonResponse({"message": chatbot_message}, status=200)
+                except openai.error.RateLimitError:
+                    time.sleep(5)  # Wait 5 seconds before retrying
+                    continue
 
-            chatbot_message = response["choices"][0]["message"]["content"]
-            return JsonResponse({"message": chatbot_message}, status=200)
+            return JsonResponse({"error": "Rate limit exceeded. Please try again later."}, status=429)
 
+        except openai.error.AuthenticationError:
+            return JsonResponse({"error": "Invalid API key provided."}, status=401)
+        except openai.error.OpenAIError as e:
+            return JsonResponse({"error": f"OpenAI API error: {str(e)}"}, status=500)
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+            return JsonResponse({"error": f"Server error: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Invalid request method."}, status=400)
 

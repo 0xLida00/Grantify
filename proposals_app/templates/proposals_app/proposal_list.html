@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Your Proposals</h1>
+<a href="{% url 'proposal_create' %}" class="btn btn-primary mb-3">Create New Proposal</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Grant Call</th>
+            <th>Status</th>
+            <th>Submitted At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for proposal in proposals %}
+        <tr>
+            <td>{{ proposal.title }}</td>
+            <td>{{ proposal.grant_call }}</td>
+            <td>{{ proposal.get_status_display }}</td>
+            <td>{{ proposal.submitted_at }}</td>
+            <td>
+                <a href="{% url 'proposal_detail' proposal.pk %}" class="btn btn-info btn-sm">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
