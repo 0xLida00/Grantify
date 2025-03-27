@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Submit Evaluation</h1>
+<h3>Proposal: {{ evaluation.proposal.title }}</h3>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a href="{% url 'evaluator_dashboard' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

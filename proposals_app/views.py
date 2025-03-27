@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from alerts_app.utils import send_email_notification, create_in_app_notification
 from django.db.models import Q
 from .models import Proposal
 from .forms import ProposalForm
@@ -46,6 +47,15 @@ def proposal_create(request):
             proposal = form.save(commit=False)
             proposal.applicant = request.user
             proposal.save()
+
+            # Send email notification
+            subject = "Proposal Submitted"
+            message = f"Your proposal '{proposal.title}' has been successfully submitted."
+            send_email_notification(request.user, subject, message)
+
+            # Create in-app notification
+            create_in_app_notification(request.user, message)
+
             return redirect('proposal_list')
     else:
         form = ProposalForm()

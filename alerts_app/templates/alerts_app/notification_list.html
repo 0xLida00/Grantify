@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Notifications</h1>
+<ul class="list-group">
+    {% for notification in notifications %}
+    <li class="list-group-item {% if not notification.is_read %}list-group-item-warning{% endif %}">
+        <p>{{ notification.message }}</p>
+        <small>{{ notification.created_at }}</small>
+        {% if not notification.is_read %}
+        <a href="{% url 'mark_notification_as_read' notification.pk %}" class="btn btn-sm btn-primary">Mark as Read</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

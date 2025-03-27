@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Evaluator Dashboard</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Proposal</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for evaluation in evaluations %}
+        <tr>
+            <td>{{ evaluation.proposal.title }}</td>
+            <td>{{ evaluation.get_status_display }}</td>
+            <td>
+                {% if evaluation.status == 'pending' or evaluation.status == 'in_progress' %}
+                <a href="{% url 'submit_evaluation' evaluation.pk %}" class="btn btn-primary btn-sm">Evaluate</a>
+                {% else %}
+                Completed
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

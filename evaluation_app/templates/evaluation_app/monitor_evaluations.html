@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Monitor Evaluations</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Proposal</th>
+            <th>Evaluator</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th>Evaluated At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for evaluation in evaluations %}
+        <tr>
+            <td>{{ evaluation.proposal.title }}</td>
+            <td>{{ evaluation.evaluator.username }}</td>
+            <td>{{ evaluation.score }}</td>
+            <td>{{ evaluation.get_status_display }}</td>
+            <td>{{ evaluation.evaluated_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

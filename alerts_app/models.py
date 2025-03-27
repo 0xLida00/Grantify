@@ -1,4 +1,3 @@
-# alerts_app/models.py
 from django.db import models
 from accounts_app.models import CustomUser
 
@@ -17,6 +16,10 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user.username}"
+
+    def mark_as_read(self):
+        self.is_read = True
+        self.save()
 
 class NotificationPreference(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="notification_preferences")
