@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Admin Dashboard</h1>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Total Proposals</h5>
+                <p>{{ total_proposals }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Total Evaluations</h5>
+                <p>{{ total_evaluations }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Average Score</h5>
+                <p>{{ average_score|default:"N/A" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Accepted Proposals</h5>
+                <p>{{ accepted_proposals }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Rejected Proposals</h5>
+                <p>{{ rejected_proposals }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

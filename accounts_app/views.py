@@ -1,9 +1,9 @@
-# accounts_app/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse_lazy
+from audit_app.models import LogEntry  # Import LogEntry for logging
 from .forms import CustomSignupForm, ProfileUpdateForm, UserUpdateForm, CustomPasswordChangeForm
 from .models import CustomUser
 
@@ -13,6 +13,17 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+
+            # Log the action
+            LogEntry.objects.create(
+                user=user,
+                action="User Registered",
+                object_repr=str(user),
+                change_message=f"User '{user.username}' registered successfully.",
+                log_level="INFO",
+                source="User",
+            )
+
             messages.success(request, "Registration successful. Welcome!")
             return redirect('home')
     else:
@@ -29,6 +40,17 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
+
+            # Log the action
+            LogEntry.objects.create(
+                user=user,
+                action="User Logged In",
+                object_repr=str(user),
+                change_message=f"User '{user.username}' logged in successfully.",
+                log_level="INFO",
+                source="User",
+            )
+
             messages.success(request, "You have been logged in.")
             # Redirect to the next URL if provided, otherwise to the home page
             if next_url:
@@ -39,7 +61,19 @@ def user_login(request):
     return render(request, 'accounts_app/login.html', {'next': next_url})
 
 def user_logout(request):
+    user = request.user
     logout(request)
+
+    # Log the action
+    LogEntry.objects.create(
+        user=user,
+        action="User Logged Out",
+        object_repr=str(user),
+        change_message=f"User '{user.username}' logged out successfully.",
+        log_level="INFO",
+        source="User",
+    )
+
     messages.success(request, "You have been logged out.")
     return redirect('home')
 
@@ -57,6 +91,17 @@ def profile(request, username):
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
+
+            # Log the action
+            LogEntry.objects.create(
+                user=request.user,
+                action="Profile Updated",
+                object_repr=str(request.user),
+                change_message=f"User '{request.user.username}' updated their profile.",
+                log_level="INFO",
+                source="User",
+            )
+
             messages.success(request, "Profile updated successfully.")
             return redirect('profile', username=request.user.username)
     else:
@@ -76,6 +121,17 @@ def password_change(request):
         if form.is_valid():
             form.save()
             update_session_auth_hash(request, form.user)
+
+            # Log the action
+            LogEntry.objects.create(
+                user=request.user,
+                action="Password Changed",
+                object_repr=str(request.user),
+                change_message=f"User '{request.user.username}' changed their password.",
+                log_level="INFO",
+                source="User",
+            )
+
             messages.success(request, "Your password has been changed successfully.")
             return redirect('profile', username=request.user.username)
         else:

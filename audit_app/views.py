@@ -1,3 +1,26 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import LogEntry
 
-# Create your views here.
+# View to display a list of logs
+@staff_member_required
+def log_list(request):
+    logs = LogEntry.objects.all().order_by('-created_at')
+
+    # Filtering by log level
+    log_level = request.GET.get('log_level')
+    if log_level:
+        logs = logs.filter(log_level=log_level)
+
+    # Filtering by user
+    user_id = request.GET.get('user')
+    if user_id:
+        logs = logs.filter(user_id=user_id)
+
+    return render(request, 'audit_app/log_list.html', {'logs': logs})
+
+# View to display details of a specific log entry
+@staff_member_required
+def log_detail(request, pk):
+    log = get_object_or_404(LogEntry, pk=pk)
+    return render(request, 'audit_app/log_detail.html', {'log': log})

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Audit Logs</h1>
+
+<!-- Filters -->
+<form method="get" class="mb-3">
+    <select name="log_level" class="form-control mb-2">
+        <option value="">All Levels</option>
+        <option value="INFO" {% if request.GET.log_level == "INFO" %}selected{% endif %}>Info</option>
+        <option value="WARNING" {% if request.GET.log_level == "WARNING" %}selected{% endif %}>Warning</option>
+        <option value="ERROR" {% if request.GET.log_level == "ERROR" %}selected{% endif %}>Error</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<!-- Log Entries -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>User</th>
+            <th>Log Level</th>
+            <th>Source</th>
+            <th>Created At</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.action }}</td>
+            <td>
+                {% if log.user %}
+                    {{ log.user.username }}
+                {% else %}
+                    System
+                {% endif %}
+            </td>
+            <td>{{ log.get_log_level_display }}</td>
+            <td>{{ log.source }}</td>
+            <td>{{ log.created_at }}</td>
+            <td>
+                <a href="{% url 'log_detail' log.pk %}" class="btn btn-info btn-sm">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

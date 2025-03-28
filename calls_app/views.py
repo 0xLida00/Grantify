@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden, JsonResponse
 from .models import GrantCall, GrantQuestion, GrantChoice
 from .forms import GrantCallForm, GrantQuestionForm, GrantChoiceForm, GrantQuestionFormSet
+from audit_app.models import LogEntry 
 
 # Logger for debugging (optional)
 import logging
@@ -92,12 +93,21 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
             question_formset.instance = grant_call
             question_formset.save()
 
+            # Log the action
+            LogEntry.objects.create(
+                user=self.request.user,
+                action="Grant Call Created",
+                object_repr=str(grant_call),
+                change_message=f"Grant call '{grant_call.title}' was created.",
+                log_level="INFO",
+                source="User",
+            )
+
             messages.success(self.request, "Grant call created successfully!")
             return redirect(self.success_url)
         else:
             messages.error(self.request, "There was an error creating the grant call. Please check the form.")
             return self.form_invalid(form)
-
 
 # Grant Call Detail View
 class GrantCallDetailView(DetailView):
@@ -124,6 +134,16 @@ def apply_grant_call(request, pk):
         messages.error(request, "This grant call is not open for applications.")
         return redirect("grant_call_list")
 
+    # Log the action
+    LogEntry.objects.create(
+        user=request.user,
+        action="Grant Call Applied",
+        object_repr=str(grant_call),
+        change_message=f"User applied for grant call '{grant_call.title}'.",
+        log_level="INFO",
+        source="User",
+    )
+
     messages.success(request, f"You have successfully applied for the grant call: {grant_call.title}")
     return redirect("grant_call_list")
 
@@ -142,9 +162,29 @@ def toggle_favorite(request, pk):
     if request.user in grant_call.favorited_by.all():
         grant_call.favorited_by.remove(request.user)
         is_favorited = False
+
+        # Log the action
+        LogEntry.objects.create(
+            user=request.user,
+            action="Grant Call Unfavorited",
+            object_repr=str(grant_call),
+            change_message=f"Grant call '{grant_call.title}' was unfavorited.",
+            log_level="INFO",
+            source="User",
+        )
     else:
         grant_call.favorited_by.add(request.user)
         is_favorited = True
+
+        # Log the action
+        LogEntry.objects.create(
+            user=request.user,
+            action="Grant Call Favorited",
+            object_repr=str(grant_call),
+            change_message=f"Grant call '{grant_call.title}' was favorited.",
+            log_level="INFO",
+            source="User",
+        )
 
     return JsonResponse({"is_favorited": is_favorited})
 
@@ -193,6 +233,15 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             question_formset.instance = grant_call
             question_formset.save()
 
+            LogEntry.objects.create(
+                user=self.request.user,
+                action="Grant Call Updated",
+                object_repr=str(grant_call),
+                change_message=f"Grant call '{grant_call.title}' was updated.",
+                log_level="INFO",
+                source="User",
+            )
+
             messages.success(self.request, "Grant call updated successfully!")
             return redirect(self.success_url)
         else:
@@ -211,6 +260,18 @@ class GrantCallDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user.role in ["admin", "org"]
 
     def delete(self, request, *args, **kwargs):
+        grant_call = self.get_object()
+
+        # Log the action
+        LogEntry.objects.create(
+            user=request.user,
+            action="Grant Call Deleted",
+            object_repr=str(grant_call),
+            change_message=f"Grant call '{grant_call.title}' was deleted.",
+            log_level="WARNING",
+            source="User",
+        )
+
         messages.success(request, "Grant call deleted successfully!")
         return super().delete(request, *args, **kwargs)
 

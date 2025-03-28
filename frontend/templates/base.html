@@ -129,16 +129,27 @@
                         <i class="fas fa-file-alt"></i> Proposals
                     </a>
                 </h4>
+
+                {% if request.user.is_staff %}
                 <h4>
                     <a href="{% url 'evaluator_dashboard' %}" class="list-group-item list-group-item-action bg-light">
                         <i class="fas fa-check"></i> Evaluation
                     </a>
                 </h4>
                 <h4>
-                    <a href="#" class="list-group-item list-group-item-action bg-light">
+                    <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action bg-light">
                         <i class="fas fa-chart-bar"></i> Reports
                     </a>
                 </h4>
+                {% endif %}
+
+                {% if request.user.is_superuser %}
+                <h4>
+                    <a href="{% url 'log_list' %}" class="list-group-item list-group-item-action bg-light">
+                        <i class="fas fa-user-shield"></i> Audit
+                    </a>
+                </h4>
+                {% endif %}
             </div>
         </div>        
             

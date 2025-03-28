@@ -1,4 +1,3 @@
-# reports_app/models.py
 from django.db import models
 from accounts_app.models import CustomUser
 
@@ -9,3 +8,9 @@ class Report(models.Model):
 
     def __str__(self):
         return f"Report generated on {self.generated_at}"
+
+    def get_formatted_data(self):
+        """
+        Returns the report data in a formatted way for display in templates.
+        """
+        return self.report_data
