@@ -11,8 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import dj_database_url
 from decouple import config
 import os
+
+load_dotenv()
 
 SECRET_KEY = config("SECRET_KEY") 
 
@@ -29,8 +33,14 @@ SECRET_KEY = 'django-insecure-1z50eku+782n+$@=t669^82br2zn12_ym#rw1v+f5()jg7*o!^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'grantify-project.onrender.com']
 AUTH_USER_MODEL = 'accounts_app.CustomUser'
+
+# Login and Logout settings
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 
 # Application definition
 
@@ -59,6 +69,9 @@ INSTALLED_APPS = [
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap4")
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Set ASGI application
+ASGI_APPLICATION = "grantify_project.asgi.application"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -99,11 +112,12 @@ WSGI_APPLICATION = 'Grantify_Project.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}", conn_max_age=600)
     }
-}
+
+# Force PostgreSQL in production (Render)
+if os.getenv("RENDER") or os.getenv("DATABASE_URL"):
+    DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 
 # Password validation
