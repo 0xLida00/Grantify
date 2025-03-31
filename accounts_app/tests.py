@@ -98,10 +98,8 @@ class AccountsAppTests(TestCase):
         )
         self.client.login(username='testuser', password='TestPassword123')
         
-        # Make the request and follow the redirect
         response = self.client.get(reverse('profile', kwargs={'username': 'otheruser'}))
         
-        # Check that the response is a redirect (302)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('home'))
     

@@ -4,6 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from alerts_app.utils import create_in_app_notification
 from django.utils.timezone import now
 from audit_app.models import LogEntry
+from alerts_app.models import Notification
 from .models import Evaluation
 from .forms import EvaluationForm
 from proposals_app.models import Proposal
@@ -31,6 +32,13 @@ def assign_evaluators(request):
             change_message=f"Evaluator '{evaluator.username}' was assigned to proposal '{proposal.title}'.",
             log_level="INFO",
             source="Admin",
+        )
+
+        Notification.objects.create(
+            user=evaluator,
+            notification_type="in_app",
+            message=f"You have been assigned to evaluate the proposal: '{proposal.title}'.",
+            is_read=False,
         )
 
         return redirect('assign_evaluators')
@@ -94,6 +102,13 @@ def submit_evaluation(request, pk):
                 change_message=f"Evaluator '{request.user.username}' submitted an evaluation for proposal '{evaluation.proposal.title}'.",
                 log_level="INFO",
                 source="User",
+            )
+
+            Notification.objects.create(
+                user=request.user,
+                notification_type="in_app",
+                message=f"You have successfully submitted your evaluation for the proposal: '{evaluation.proposal.title}'.",
+                is_read=False,
             )
 
             return redirect('evaluator_dashboard')

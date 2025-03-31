@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Notification, NotificationPreference
 from .forms import NotificationPreferenceForm
 
@@ -14,6 +15,8 @@ def notification_list(request):
 def mark_notification_as_read(request, pk):
     notification = get_object_or_404(Notification, pk=pk, user=request.user)
     notification.mark_as_read()
+
+    messages.success(request, "Notification marked as read.")
     return redirect('notification_list')
 
 # Manage notification preferences
@@ -24,6 +27,8 @@ def notification_preferences(request):
         form = NotificationPreferenceForm(request.POST, instance=preferences)
         if form.is_valid():
             form.save()
+
+            messages.success(request, "Notification preferences updated successfully.")
             return redirect('notification_preferences')
     else:
         form = NotificationPreferenceForm(instance=preferences)

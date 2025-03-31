@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden, JsonResponse
+from alerts_app.models import Notification
 from .models import GrantCall, GrantQuestion, GrantChoice
 from .forms import GrantCallForm, GrantQuestionForm, GrantChoiceForm, GrantQuestionFormSet
 from audit_app.models import LogEntry 
@@ -103,6 +104,13 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
                 source="User",
             )
 
+            Notification.objects.create(
+                user=self.request.user,
+                notification_type="in_app",
+                message=f"Grant call '{grant_call.title}' has been created successfully.",
+                is_read=False,
+            )
+
             messages.success(self.request, "Grant call created successfully!")
             return redirect(self.success_url)
         else:
@@ -142,6 +150,13 @@ def apply_grant_call(request, pk):
         change_message=f"User applied for grant call '{grant_call.title}'.",
         log_level="INFO",
         source="User",
+    )
+
+    Notification.objects.create(
+        user=request.user,
+        notification_type="in_app",
+        message=f"You have successfully applied for the grant call: '{grant_call.title}'.",
+        is_read=False,
     )
 
     messages.success(request, f"You have successfully applied for the grant call: {grant_call.title}")
@@ -270,6 +285,13 @@ class GrantCallDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             change_message=f"Grant call '{grant_call.title}' was deleted.",
             log_level="WARNING",
             source="User",
+        )
+
+        Notification.objects.create(
+            user=request.user,
+            notification_type="in_app",
+            message=f"Grant call '{grant_call.title}' has been deleted.",
+            is_read=False,
         )
 
         messages.success(request, "Grant call deleted successfully!")
