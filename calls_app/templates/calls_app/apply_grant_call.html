@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Apply for Grant Call: {{ grant_call.title }}</h1>
+
+    <!-- Grant Call Details -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Grant Details</h5>
+            <p><strong>Description:</strong> {{ grant_call.description }}</p>
+            <p><strong>Deadline:</strong> {{ grant_call.deadline }}</p>
+            <p><strong>Eligibility:</strong></p>
+            <ol>
+                {% for criterion in grant_call.eligibility.splitlines %}
+                <li>{{ criterion }}</li>
+                {% endfor %}
+            </ol>
+            <p><strong>Budget:</strong> ${{ grant_call.budget }}</p>
+            <p><strong>Status:</strong> 
+                <span class="badge 
+                    {% if grant_call.status == 'open' %}badge-success
+                    {% elif grant_call.status == 'closed' %}badge-danger
+                    {% else %}badge-secondary{% endif %}">
+                    {{ grant_call.get_status_display }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Application Form -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" name="save" class="btn btn-secondary">Save Progress</button>
+            <a href="{% url 'grant_call_list' %}" class="btn btn-secondary mx-2">Back</a>
+            <button type="submit" name="submit" class="btn btn-primary">Submit Application</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -11,8 +11,8 @@ from django.views.generic import ListView, CreateView, DetailView, DeleteView, U
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden, JsonResponse
 from alerts_app.models import Notification
-from .models import GrantCall, GrantQuestion, GrantChoice
-from .forms import GrantCallForm, GrantQuestionForm, GrantChoiceForm, GrantQuestionFormSet
+from .models import GrantCall, GrantQuestion, GrantChoice, GrantResponse
+from .forms import GrantCallForm, GrantQuestionForm, GrantChoiceForm, GrantQuestionFormSet, ApplicationForm, GrantChoiceFormSet
 from audit_app.models import LogEntry 
 
 # Logger for debugging (optional)
@@ -79,8 +79,18 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
             context["question_formset"] = GrantQuestionFormSet(self.request.POST)
+            context["choice_formsets"] = [
+                GrantChoiceFormSet(self.request.POST, instance=question_form.instance)
+                for question_form in context["question_formset"]
+                if question_form.instance.question_type == "multiple_choice"
+            ]
         else:
             context["question_formset"] = GrantQuestionFormSet()
+            context["choice_formsets"] = [
+                GrantChoiceFormSet(instance=question_form.instance)
+                for question_form in context["question_formset"]
+                if question_form.instance.question_type == "multiple_choice"
+            ]
         return context
 
     def form_valid(self, form):
@@ -92,7 +102,14 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
             grant_call.save()
 
             question_formset.instance = grant_call
-            question_formset.save()
+            questions = question_formset.save()
+
+            # Handle choices for multiple-choice questions
+            for question in questions:
+                if question.question_type == "multiple_choice":
+                    choice_formset = GrantChoiceFormSet(self.request.POST, instance=question)
+                    if choice_formset.is_valid():
+                        choice_formset.save()
 
             # Log the action
             LogEntry.objects.create(
@@ -129,7 +146,6 @@ class GrantCallDetailView(DetailView):
         context["questions"] = grant_call.questions.all()
         return context
 
-# Apply Grant Call View
 @login_required
 def apply_grant_call(request, pk):
     '''View for applying to a grant call'''
@@ -142,26 +158,66 @@ def apply_grant_call(request, pk):
         messages.error(request, "This grant call is not open for applications.")
         return redirect("grant_call_list")
 
-    # Log the action
-    LogEntry.objects.create(
-        user=request.user,
-        action="Grant Call Applied",
-        object_repr=str(grant_call),
-        change_message=f"User applied for grant call '{grant_call.title}'.",
-        log_level="INFO",
-        source="User",
-    )
+    # Fetch the questions for the grant call
+    questions = grant_call.questions.all()
 
-    Notification.objects.create(
-        user=request.user,
-        notification_type="in_app",
-        message=f"You have successfully applied for the grant call: '{grant_call.title}'.",
-        is_read=False,
-    )
+    # Prepopulate the form with existing responses
+    initial_data = {}
+    for question in questions:
+        try:
+            response = GrantResponse.objects.get(question=question, user=request.user, grant_call=grant_call)
+            initial_data[f'question_{question.id}_response'] = response.response
+        except GrantResponse.DoesNotExist:
+            pass
 
-    messages.success(request, f"You have successfully applied for the grant call: {grant_call.title}")
-    return redirect("grant_call_list")
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST, request.FILES, questions=questions, initial=initial_data)
+        if form.is_valid():
+            # Save the applicant's responses
+            for question in questions:
+                response_text = form.cleaned_data.get(f'question_{question.id}_response')
+                response_file = form.cleaned_data.get(f'question_{question.id}_file')
+                response, created = GrantResponse.objects.get_or_create(
+                    question=question,
+                    user=request.user,
+                    grant_call=grant_call,
+                )
+                response.response = response_text
+                if response_file:
+                    response.file = response_file
+                response.is_final_submission = 'submit' in request.POST  # Mark as final submission if "Submit" is clicked
+                response.save()
 
+            # Log the action
+            LogEntry.objects.create(
+                user=request.user,
+                action="Grant Call Applied",
+                object_repr=str(grant_call),
+                change_message=f"User applied for grant call '{grant_call.title}'.",
+                log_level="INFO",
+                source="User",
+            )
+
+            # Create a notification
+            if 'submit' in request.POST:
+                Notification.objects.create(
+                    user=request.user,
+                    notification_type="in_app",
+                    message=f"You have successfully submitted your application for the grant call: '{grant_call.title}'.",
+                    is_read=False,
+                )
+                messages.success(request, f"You have successfully submitted your application for the grant call: {grant_call.title}")
+                return redirect("grant_call_list")
+            else:
+                messages.success(request, "Your progress has been saved. You can return to complete your application later.")
+                return redirect("apply_grant_call", pk=grant_call.pk)
+    else:
+        form = ApplicationForm(questions=questions, initial=initial_data)
+
+    return render(request, 'calls_app/apply_grant_call.html', {
+        'grant_call': grant_call,
+        'form': form,
+    })
 
 # Toggle Favorite View
 @login_required
@@ -233,8 +289,16 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
             context["question_formset"] = GrantQuestionFormSet(self.request.POST, instance=self.get_object())
+            context["choice_formsets"] = [
+                GrantChoiceFormSet(self.request.POST, instance=question_form.instance)
+                for question_form in context["question_formset"]
+            ]
         else:
             context["question_formset"] = GrantQuestionFormSet(instance=self.get_object())
+            context["choice_formsets"] = [
+                GrantChoiceFormSet(instance=question_form.instance)
+                for question_form in context["question_formset"]
+            ]
         return context
 
     def form_valid(self, form):
@@ -246,8 +310,15 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             grant_call.save()
 
             question_formset.instance = grant_call
-            question_formset.save()
+            questions = question_formset.save()
 
+            for question_form, choice_formset in zip(context["question_formset"], context["choice_formsets"]):
+                if question_form.cleaned_data.get("question_type") == "multiple_choice":
+                    choice_formset.instance = question_form.instance
+                    if choice_formset.is_valid():
+                        choice_formset.save()
+
+            # Log the action
             LogEntry.objects.create(
                 user=self.request.user,
                 action="Grant Call Updated",

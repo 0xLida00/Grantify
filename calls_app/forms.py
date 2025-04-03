@@ -1,7 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import GrantCall, GrantQuestion, GrantChoice
-
+from .models import GrantCall, GrantQuestion, GrantChoice, GrantResponse
 
 class GrantCallForm(forms.ModelForm):
     class Meta:
@@ -40,6 +39,39 @@ GrantQuestionFormSet = inlineformset_factory(
     GrantCall,
     GrantQuestion,
     form=GrantQuestionForm,
-    extra=1,  # Start with one empty form
-    can_delete=True,  # Allow deleting questions
+    extra=1,
+    can_delete=True,
 )
+
+GrantChoiceFormSet = inlineformset_factory(
+    GrantQuestion,
+    GrantChoice,
+    form=GrantChoiceForm,
+    extra=1,
+    can_delete=True,
+)
+
+
+class ApplicationForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        questions = kwargs.pop('questions', [])
+        super().__init__(*args, **kwargs)
+        for question in questions:
+            if question.question_type == 'open':
+                self.fields[f'question_{question.id}_response'] = forms.CharField(
+                    label=question.question_text,
+                    widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+                    required=False,
+                )
+            elif question.question_type == 'multiple_choice':
+                self.fields[f'question_{question.id}_response'] = forms.ChoiceField(
+                    label=question.question_text,
+                    choices=[(choice.id, choice.choice_text) for choice in question.choices.all()],
+                    widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+                    required=True,
+                )
+            elif question.question_type == 'file_upload':
+                self.fields[f'question_{question.id}_file'] = forms.FileField(
+                    label=question.question_text,
+                    required=False,
+                )

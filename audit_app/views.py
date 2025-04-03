@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import LogEntry
@@ -17,7 +18,12 @@ def log_list(request):
     if user_id:
         logs = logs.filter(user_id=user_id)
 
-    return render(request, 'audit_app/log_list.html', {'logs': logs})
+    # Pagination: 25 logs per page
+    paginator = Paginator(logs, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'audit_app/log_list.html', {'page_obj': page_obj})
 
 # View to display details of a specific log entry
 @staff_member_required

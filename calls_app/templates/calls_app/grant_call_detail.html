@@ -39,7 +39,7 @@
                 {% for question in grant_call.questions.all %}
                 <li class="list-group-item">
                     <strong>{{ question.question_text }}</strong>
-                    {% if question.choices.exists %}
+                    {% if question.question_type == "multiple_choice" and question.choices.exists %}
                     <ul class="mt-2">
                         {% for choice in question.choices.all %}
                         <li>{{ choice.choice_text }}</li>

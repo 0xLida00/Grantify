@@ -43,3 +43,20 @@ class GrantChoice(models.Model):
 
     def __str__(self):
         return self.choice_text
+    
+
+from django.db import models
+from accounts_app.models import CustomUser
+
+class GrantResponse(models.Model):
+    question = models.ForeignKey(GrantQuestion, on_delete=models.CASCADE, related_name="responses")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    grant_call = models.ForeignKey(GrantCall, on_delete=models.CASCADE, related_name="responses")
+    response = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to="grant_responses/", blank=True, null=True)
+    is_final_submission = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Response by {self.user.username} to {self.question.question_text}"

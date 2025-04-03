@@ -1,50 +1,83 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Audit Logs</h1>
+<div class="container mt-4">
+    <h1>Audit Logs</h1>
 
-<!-- Filters -->
-<form method="get" class="mb-3">
-    <select name="log_level" class="form-control mb-2">
-        <option value="">All Levels</option>
-        <option value="INFO" {% if request.GET.log_level == "INFO" %}selected{% endif %}>Info</option>
-        <option value="WARNING" {% if request.GET.log_level == "WARNING" %}selected{% endif %}>Warning</option>
-        <option value="ERROR" {% if request.GET.log_level == "ERROR" %}selected{% endif %}>Error</option>
-    </select>
-    <button type="submit" class="btn btn-primary">Filter</button>
-</form>
+    <!-- Filters -->
+    <form method="get" class="mb-3">
+        <select name="log_level" class="form-control mb-2">
+            <option value="">All Levels</option>
+            <option value="INFO" {% if request.GET.log_level == "INFO" %}selected{% endif %}>Info</option>
+            <option value="WARNING" {% if request.GET.log_level == "WARNING" %}selected{% endif %}>Warning</option>
+            <option value="ERROR" {% if request.GET.log_level == "ERROR" %}selected{% endif %}>Error</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
 
-<!-- Log Entries -->
-<table class="table">
-    <thead>
-        <tr>
-            <th>Action</th>
-            <th>User</th>
-            <th>Log Level</th>
-            <th>Source</th>
-            <th>Created At</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for log in logs %}
-        <tr>
-            <td>{{ log.action }}</td>
-            <td>
-                {% if log.user %}
-                    {{ log.user.username }}
-                {% else %}
-                    System
-                {% endif %}
-            </td>
-            <td>{{ log.get_log_level_display }}</td>
-            <td>{{ log.source }}</td>
-            <td>{{ log.created_at }}</td>
-            <td>
-                <a href="{% url 'log_detail' log.pk %}" class="btn btn-info btn-sm">View</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- Log Entries -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>User</th>
+                <th>Log Level</th>
+                <th>Source</th>
+                <th>Created At</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in page_obj %}
+            <tr>
+                <td>{{ log.action }}</td>
+                <td>
+                    {% if log.user %}
+                        {{ log.user.username }}
+                    {% else %}
+                        System
+                    {% endif %}
+                </td>
+                <td>{{ log.get_log_level_display }}</td>
+                <td>{{ log.source }}</td>
+                <td>{{ log.created_at }}</td>
+                <td>
+                    <a href="{% url 'log_detail' log.pk %}" class="btn btn-info btn-sm">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No logs found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.log_level %}&log_level={{ request.GET.log_level }}{% endif %}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.log_level %}&log_level={{ request.GET.log_level }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.log_level %}&log_level={{ request.GET.log_level }}{% endif %}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.log_level %}&log_level={{ request.GET.log_level }}{% endif %}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
 {% endblock %}
