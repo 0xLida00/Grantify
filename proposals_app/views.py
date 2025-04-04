@@ -1,13 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-from alerts_app.utils import send_email_notification, create_in_app_notification
 from django.db.models import Q
 from .models import Proposal
-from .forms import ProposalForm
-from calls_app.models import GrantCall
+from calls_app.models import GrantCall, GrantResponse
 
 
+# Admin: List all proposals for a specific grant call
 @staff_member_required
 def admin_proposal_list(request):
     grant_call_id = request.GET.get('grant_call')
@@ -29,54 +28,31 @@ def admin_proposal_list(request):
         'selected_status': status,
     })
 
+
+# Admin: View proposal details
+@staff_member_required
+def admin_proposal_detail(request, pk):
+    proposal = get_object_or_404(Proposal, pk=pk)
+    responses = GrantResponse.objects.filter(grant_call=proposal.grant_call, user=proposal.applicant)
+    return render(request, 'proposals_app/admin_proposal_detail.html', {
+        'proposal': proposal,
+        'responses': responses,
+    })
+
+
+# Applicant: List saved and submitted proposals
 @login_required
 def proposal_list(request):
     proposals = Proposal.objects.filter(applicant=request.user)
     return render(request, 'proposals_app/proposal_list.html', {'proposals': proposals})
 
+
+# Applicant: View proposal details
 @login_required
 def proposal_detail(request, pk):
     proposal = get_object_or_404(Proposal, pk=pk, applicant=request.user)
-    return render(request, 'proposals_app/proposal_detail.html', {'proposal': proposal})
-
-@login_required
-def proposal_create(request):
-    if request.method == 'POST':
-        form = ProposalForm(request.POST, request.FILES)
-        if form.is_valid():
-            proposal = form.save(commit=False)
-            proposal.applicant = request.user
-            proposal.save()
-
-            # Send email notification
-            subject = "Proposal Submitted"
-            message = f"Your proposal '{proposal.title}' has been successfully submitted."
-            send_email_notification(request.user, subject, message)
-
-            # Create in-app notification
-            create_in_app_notification(request.user, message)
-
-            return redirect('proposal_list')
-    else:
-        form = ProposalForm()
-    return render(request, 'proposals_app/proposal_form.html', {'form': form})
-
-@login_required
-def proposal_update(request, pk):
-    proposal = get_object_or_404(Proposal, pk=pk, applicant=request.user)
-    if request.method == 'POST':
-        form = ProposalForm(request.POST, request.FILES, instance=proposal)
-        if form.is_valid():
-            form.save()
-            return redirect('proposal_list')
-    else:
-        form = ProposalForm(instance=proposal)
-    return render(request, 'proposals_app/proposal_form.html', {'form': form})
-
-@login_required
-def proposal_delete(request, pk):
-    proposal = get_object_or_404(Proposal, pk=pk, applicant=request.user)
-    if request.method == 'POST':
-        proposal.delete()
-        return redirect('proposal_list')
-    return render(request, 'proposals_app/proposal_confirm_delete.html', {'proposal': proposal})
+    responses = GrantResponse.objects.filter(grant_call=proposal.grant_call, user=request.user)
+    return render(request, 'proposals_app/proposal_detail.html', {
+        'proposal': proposal,
+        'responses': responses,
+    })

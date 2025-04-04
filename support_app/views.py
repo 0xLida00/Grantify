@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render
+from django.contrib import messages
 from .models import FAQ, SupportTicket, Feedback
 from .serializers import FAQSerializer, SupportTicketSerializer, FeedbackSerializer
 from .forms import SupportTicketForm, FeedbackForm
@@ -32,7 +33,6 @@ class FAQListView(APIView):
         serializer = FAQSerializer(faqs, many=True)
         return Response(serializer.data)
 
-# API View for Creating Support Tickets
 class SupportTicketCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -40,8 +40,19 @@ class SupportTicketCreateView(APIView):
         serializer = SupportTicketSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            return Response({"message": "Support ticket created successfully!"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Return the success message in the JSON response
+            return Response(
+                {"message": "Support ticket created successfully!".strip()},
+                status=status.HTTP_201_CREATED
+            )
+        # Return the error message in the JSON response
+        return Response(
+            {
+                "message": "Failed to create support ticket. Please check the form.".strip(),
+                "errors": serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 # API View for Creating Feedback
 class FeedbackCreateView(APIView):
@@ -51,8 +62,19 @@ class FeedbackCreateView(APIView):
         serializer = FeedbackSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            return Response({"message": "Feedback submitted successfully!"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Return the success message in the JSON response
+            return Response(
+                {"message": "Feedback submitted successfully!".strip()},
+                status=status.HTTP_201_CREATED
+            )
+        # Return the error message in the JSON response
+        return Response(
+            {
+                "message": "Failed to submit feedback. Please check the form.".strip(),
+                "errors": serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 # FAQ Page View
 class FAQPageView(ListView):

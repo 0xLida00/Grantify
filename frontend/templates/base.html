@@ -159,8 +159,9 @@
             <!-- Main Content -->
             <main class="main-content container mt-4">
                 <!-- Flash Messages Section -->
+                <!-- Server-Rendered Flash Messages -->
                 {% if messages %}
-                    <div class="flash-messages-container">
+                    <div class="server-flash-messages-container">
                         {% for message in messages %}
                             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                                 {{ message }}
@@ -171,7 +172,10 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-        
+
+                <!-- Dynamically Added Flash Messages -->
+                <div class="dynamic-flash-messages-container"></div>
+
                 {% block content %}{% endblock %}
             </main>
     </div>
@@ -223,10 +227,19 @@
             <!-- Support Ticket Form -->
             <div id="support-ticket-section">
                 <h5>Create a Support Ticket</h5>
-                <form id="support-ticket-form" method="post" action="{% url 'support_ticket_create' %}">
+                <form id="support-ticket-form" method="post">
                     {% csrf_token %}
                     <input type="text" id="ticket-subject" name="subject" placeholder="Enter the subject of your issue" class="form-control" required>
                     <textarea id="ticket-description" name="description" placeholder="Describe your issue in detail" class="form-control" rows="4" required></textarea>
+                    
+                    <!-- Priority Dropdown -->
+                    <label for="ticket-priority" class="form-label mt-2">Priority:</label>
+                    <select id="ticket-priority" name="priority" class="form-control" required>
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>

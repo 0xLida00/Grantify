@@ -2,38 +2,32 @@
 {% load static %}
 
 {% block content %}
-<h1>Admin: Manage Proposals</h1>
-
+<h1>Proposals</h1>
 <form method="get" class="mb-3">
     <select name="grant_call" class="form-control mb-2">
         <option value="">All Grant Calls</option>
-        {% for grant_call in grant_calls %}
-        <option value="{{ grant_call.id }}" {% if grant_call.id|stringformat:"s" == selected_grant_call %}selected{% endif %}>
-            {{ grant_call.title }}
+        {% for call in grant_calls %}
+        <option value="{{ call.id }}" {% if call.id|stringformat:"s" == selected_grant_call %}selected{% endif %}>
+            {{ call.title }}
         </option>
         {% endfor %}
     </select>
-
     <select name="status" class="form-control mb-2">
         <option value="">All Statuses</option>
-        {% for choice, display in proposal_model.STATUS_CHOICES %}
-        <option value="{{ choice }}" {% if choice == selected_status %}selected{% endif %}>
-            {{ display }}
-        </option>
-        {% endfor %}
+        <option value="submitted" {% if selected_status == "submitted" %}selected{% endif %}>Submitted</option>
+        <option value="under_review" {% if selected_status == "under_review" %}selected{% endif %}>Under Review</option>
+        <option value="accepted" {% if selected_status == "accepted" %}selected{% endif %}>Accepted</option>
+        <option value="rejected" {% if selected_status == "rejected" %}selected{% endif %}>Rejected</option>
     </select>
-
     <button type="submit" class="btn btn-primary">Filter</button>
 </form>
-
 <table class="table">
     <thead>
         <tr>
             <th>Title</th>
-            <th>Grant Call</th>
             <th>Applicant</th>
+            <th>Grant Call</th>
             <th>Status</th>
-            <th>Submitted At</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -41,12 +35,11 @@
         {% for proposal in proposals %}
         <tr>
             <td>{{ proposal.title }}</td>
+            <td>{{ proposal.applicant.username }}</td>
             <td>{{ proposal.grant_call }}</td>
-            <td>{{ proposal.applicant }}</td>
             <td>{{ proposal.get_status_display }}</td>
-            <td>{{ proposal.submitted_at }}</td>
             <td>
-                <a href="{% url 'proposal_detail' proposal.pk %}" class="btn btn-info btn-sm">View</a>
+                <a href="{% url 'admin_proposal_detail' proposal.pk %}" class="btn btn-info btn-sm">View</a>
             </td>
         </tr>
         {% endfor %}

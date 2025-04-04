@@ -1,10 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("support.js loaded and DOMContentLoaded event triggered.");
+
     const supportIcon = document.getElementById("support-icon");
     const supportModal = document.getElementById("support-modal");
     const closeModal = document.querySelector(".support-modal .close");
-    const faqList = document.getElementById("faq-list");
     const supportTicketForm = document.getElementById("support-ticket-form");
     const feedbackForm = document.getElementById("feedback-form");
+    const dynamicFlashMessagesContainer = document.querySelector(".dynamic-flash-messages-container"); // For dynamically added flash messages
 
     // Function to get CSRF token
     function getCSRFToken() {
@@ -12,9 +14,31 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken ? csrfToken.value : '';
     }
 
-    // Ensure elements exist before adding event listeners
+    // Function to display flash messages dynamically
+    function displayFlashMessage(message, type) {
+        const trimmedMessage = message.trim();
+    
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+        alertDiv.role = "alert";
+        alertDiv.innerHTML = `
+            ${trimmedMessage}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        if (dynamicFlashMessagesContainer) {
+            dynamicFlashMessagesContainer.appendChild(alertDiv);
+        } else {
+            console.error("Dynamic flash messages container not found in the DOM.");
+        }
+    
+        // Automatically remove the message after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+
+    // Toggle the support modal
     if (supportIcon && supportModal && closeModal) {
-        // Toggle the support modal
         supportIcon.addEventListener("click", function () {
             supportModal.style.display = "block";
         });
@@ -23,32 +47,11 @@ document.addEventListener("DOMContentLoaded", function () {
             supportModal.style.display = "none";
         });
 
-        // Close modal when clicking outside of it
         window.addEventListener("click", function (e) {
             if (e.target === supportModal) {
                 supportModal.style.display = "none";
             }
         });
-    }
-
-    // Fetch FAQs
-    if (faqList) {
-        fetch("/api/faqs/")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch FAQs");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                faqList.innerHTML = "";
-                data.forEach((faq) => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `<strong>${faq.question}</strong><p>${faq.answer}</p>`;
-                    faqList.appendChild(li);
-                });
-            })
-            .catch((error) => console.error("Error fetching FAQs:", error));
     }
 
     // Handle support ticket form submission
@@ -57,24 +60,31 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             const subject = document.getElementById("ticket-subject").value;
             const description = document.getElementById("ticket-description").value;
+            const priority = document.getElementById("ticket-priority").value;
 
             fetch("/api/support-tickets/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken": getCSRFToken(), // Add CSRF token
+                    "X-CSRFToken": getCSRFToken(),
                 },
-                body: JSON.stringify({ subject, description }),
+                body: JSON.stringify({ subject, description, priority }),
             })
-                .then((response) => {
-                    if (response.ok) {
-                        alert("Support ticket created successfully!");
+                .then((response) => response.json().then((data) => ({ status: response.status, body: data })))
+                .then(({ status, body }) => {
+                    if (status === 201) {
+                        console.log("Support ticket created successfully."); // Debugging log
+                        displayFlashMessage(body.message, "success");
                         supportTicketForm.reset();
                     } else {
-                        alert("Failed to create support ticket.");
+                        console.error("Validation errors:", body.errors); // Debugging log
+                        displayFlashMessage(body.message, "danger");
                     }
                 })
-                .catch((error) => console.error("Error creating support ticket:", error));
+                .catch((error) => {
+                    console.error("Error creating support ticket:", error); // Debugging log
+                    displayFlashMessage("An error occurred. Please try again later.", "danger");
+                });
         });
     }
 
@@ -88,19 +98,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken": getCSRFToken(), // Add CSRF token
+                    "X-CSRFToken": getCSRFToken(),
                 },
                 body: JSON.stringify({ message }),
             })
-                .then((response) => {
-                    if (response.ok) {
-                        alert("Feedback submitted successfully!");
+                .then((response) => response.json().then((data) => ({ status: response.status, body: data })))
+                .then(({ status, body }) => {
+                    if (status === 201) {
+                        console.log("Feedback submitted successfully."); // Debugging log
+                        displayFlashMessage(body.message, "success");
                         feedbackForm.reset();
                     } else {
-                        alert("Failed to submit feedback.");
+                        console.error("Validation errors:", body.errors); // Debugging log
+                        displayFlashMessage(body.message, "danger");
                     }
                 })
-                .catch((error) => console.error("Error submitting feedback:", error));
+                .catch((error) => {
+                    console.error("Error submitting feedback:", error); // Debugging log
+                    displayFlashMessage("An error occurred. Please try again later.", "danger");
+                });
         });
     }
 });
