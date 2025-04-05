@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Ticket Details</h1>
+<div class="card">
+    <div class="card-header">
+        <h4>Ticket ID: {{ ticket.id }}</h4>
+    </div>
+    <div class="card-body">
+        <p><strong>Subject:</strong> {{ ticket.subject }}</p>
+        <p><strong>Description:</strong> {{ ticket.description }}</p>
+        <p><strong>Priority:</strong> 
+            <span class="badge badge-{% if ticket.priority == 'high' %}danger{% elif ticket.priority == 'medium' %}warning{% else %}success{% endif %}">
+                {{ ticket.priority|capfirst }}
+            </span>
+        </p>
+        <p><strong>Status:</strong> 
+            <span class="badge badge-{% if ticket.status == 'open' %}primary{% elif ticket.status == 'in_progress' %}info{% elif ticket.status == 'resolved' %}success{% else %}secondary{% endif %}">
+                {{ ticket.status|capfirst }}
+            </span>
+        </p>
+        <p><strong>Updates:</strong></p>
+        <div class="alert alert-info">
+            {{ ticket.response|default:"No response yet"|linebreaksbr }}
+        </div>
+    </div>
+</div>
+
+<h2>Send an Update</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="user_response">Your Response</label>
+        <textarea name="user_response" id="user_response" class="form-control" rows="4" placeholder="Write your response..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Update</button>
+    <a href="{% url 'user_ticket_list' %}" class="btn btn-secondary mx-2">Back</a>
+</form>
+<br>
+{% endblock %}

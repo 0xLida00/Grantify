@@ -29,6 +29,7 @@ psycopg
 pycparser==2.22
 pyOpenSSL==25.0.0
 redis==5.2.1
+selenium
 service-identity==24.2.0
 setuptools==75.8.0
 sqlparse==0.5.3

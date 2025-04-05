@@ -1,16 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}FAQs{% endblock %}
-
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Frequently Asked Questions</h1>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <ul class="list-group">
         {% for faq in faqs %}
         <li class="list-group-item">
             <h5>{{ faq.question }}</h5>
             <p>{{ faq.answer }}</p>
+            <div>
+                <button class="btn btn-success btn-sm vote-btn" data-id="{{ faq.id }}" data-vote="up">
+                    👍 {{ faq.thumbs_up }}
+                </button>
+                <button class="btn btn-danger btn-sm vote-btn" data-id="{{ faq.id }}" data-vote="down">
+                    👎 {{ faq.thumbs_down }}
+                </button>
+            </div>
         </li>
         {% empty %}
         <li class="list-group-item text-center">No FAQs available at the moment.</li>

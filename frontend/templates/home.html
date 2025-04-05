@@ -1,20 +1,27 @@
 {% extends 'base.html' %}
-{% block title %}Home - Grantify{% endblock %}
+{% block title %}Welcome to Grantify{% endblock %}
 {% block content %}
 <div class="container mt-5">
+  <!-- Welcome Section -->
   <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm">
+    <div class="col-md-10">
+      <div class="card shadow-lg">
         <div class="card-header bg-primary text-white text-center">
-          <h3 class="mb-0">Welcome to Grantify</h3>
+          <h1 class="mb-0">Welcome to Grantify</h1>
         </div>
-        <div class="card-body bg-white">
-          <p class="lead text-center">Manage your grant calls, proposals, evaluations, and reports seamlessly.</p>
-          <p class="text-center">Grantify is your comprehensive platform to streamline the grant management process. Log in or sign up to get started!</p>
+        <div class="card-body bg-light">
+          <p class="lead text-center">Your all-in-one platform for managing grant calls, proposals, evaluations, and reports.</p>
+          <p class="text-center">Streamline your grant management process with ease and efficiency. Whether you're an applicant, evaluator, or admin, Grantify has the tools you need.</p>
           <div class="text-center mt-4">
             {% if user.is_authenticated %}
               <a href="{% url 'profile' user.username %}" class="btn btn-primary mx-2">
                 <i class="bi bi-person-circle"></i> Your Profile
+              </a>
+              <a href="{% url 'user_ticket_list' %}" class="btn btn-secondary mx-2">
+                <i class="bi bi-ticket-perforated"></i> Your Tickets
+              </a>
+              <a href="{% url 'faq_page' %}" class="btn btn-info mx-2">
+                <i class="bi bi-question-circle"></i> FAQs
               </a>
             {% else %}
               <a href="{% url 'login' %}" class="btn btn-primary mx-2">
@@ -25,6 +32,72 @@
               </a>
             {% endif %}
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="row mt-5">
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <i class="bi bi-bullhorn display-4 text-primary"></i>
+          <h4 class="mt-3">Grant Calls</h4>
+          <p>Discover and manage grant opportunities tailored to your needs.</p>
+          <a href="{% url 'grant_call_list' %}" class="btn btn-outline-primary">View Grant Calls</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <i class="bi bi-file-earmark-text display-4 text-success"></i>
+          <h4 class="mt-3">Proposals</h4>
+          <p>Create, submit, and track your grant proposals with ease.</p>
+          <a href="{% url 'proposal_list' %}" class="btn btn-outline-success">Manage Proposals</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <i class="bi bi-clipboard-check display-4 text-info"></i>
+          <h4 class="mt-3">Evaluations</h4>
+          <p>Evaluate and review proposals efficiently with our tools.</p>
+          {% if user.is_staff %}
+          <a href="{% url 'evaluator_dashboard' %}" class="btn btn-outline-info">Go to Evaluations</a>
+          {% else %}
+          <a href="#" class="btn btn-outline-info disabled">Restricted</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ and Support Section -->
+  <div class="row mt-5">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <i class="bi bi-question-circle display-4 text-warning"></i>
+          <h4 class="mt-3">FAQs</h4>
+          <p>Find answers to common questions and learn how to use Grantify.</p>
+          <a href="{% url 'faq_page' %}" class="btn btn-outline-warning">View FAQs</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <i class="bi bi-life-preserver display-4 text-danger"></i>
+          <h4 class="mt-3">Support</h4>
+          <p>Need help? Submit a support ticket and get assistance.</p>
+          {% if user.is_authenticated %}
+          <a href="{% url 'user_ticket_list' %}" class="btn btn-outline-danger">Get Support</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline-danger">Login to Submit Ticket</a>
+          {% endif %}
         </div>
       </div>
     </div>

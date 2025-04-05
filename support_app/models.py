@@ -18,6 +18,7 @@ class SupportTicket(models.Model):
     description = models.TextField()
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    response = models.TextField(blank=True, null=True)  # Admin's response
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -34,8 +35,18 @@ class Feedback(models.Model):
         return f"Feedback from {self.user.username} (Rating: {self.rating})"
 
 class FAQ(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+    )
+
     question = models.CharField(max_length=255)
     answer = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    thumbs_up = models.PositiveIntegerField(default=0)
+    thumbs_down = models.PositiveIntegerField(default=0)
+    voted_up = models.ManyToManyField(CustomUser, related_name='voted_up_faqs', blank=True)
+    voted_down = models.ManyToManyField(CustomUser, related_name='voted_down_faqs', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

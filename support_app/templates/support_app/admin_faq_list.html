@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Manage FAQs</h1>
+<a href="{% url 'admin_faq_create' %}" class="btn btn-primary mb-3">Create FAQ</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Question</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for faq in faqs %}
+        <tr>
+            <td>{{ faq.id }}</td>
+            <td>{{ faq.question }}</td>
+            <td>{{ faq.status|capfirst }}</td>
+            <td>
+                <a href="{% url 'admin_faq_edit' faq.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'admin_faq_delete' faq.id %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

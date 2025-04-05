@@ -1,5 +1,5 @@
 from django import forms
-from .models import SupportTicket, Feedback
+from .models import SupportTicket, Feedback, FAQ
 
 class SupportTicketForm(forms.ModelForm):
     class Meta:
@@ -35,4 +35,14 @@ class FeedbackForm(forms.ModelForm):
                 'min': 1,
                 'max': 5,
             }),
+        }
+
+class FAQForm(forms.ModelForm):
+    class Meta:
+        model = FAQ
+        fields = ['question', 'answer', 'status']
+        widgets = {
+            'question': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the question'}),
+            'answer': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter the answer'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
         }

@@ -62,7 +62,7 @@ body {
 
 /* Sidebar styles */
 #sidebar-wrapper {
-  position: fixed; /* Fix sidebar on the left */
+  position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
@@ -93,12 +93,12 @@ body {
 
 /* Page content styles */
 #page-content-wrapper {
-  margin-left: 250px;  /* Push content to the right of the fixed sidebar */
+  margin-left: 250px;
   width: calc(100% - 250px);
   padding: 0;
 }
 
-/* Toggled state for sidebar (if using JS to hide sidebar) */
+/* Toggled state for sidebar */
 #wrapper.toggled #sidebar-wrapper {
   margin-left: -250px;
 }
@@ -110,13 +110,13 @@ body {
 
 /* Footer Styling - Sticky Footer */
 footer.footer {
-  background-color: #343a40; /* Blue/Gray theme can be adjusted */
+  background-color: #343a40;
   padding: 10px 0;
   color: white;
   width: 100%;
   text-align: center;
   z-index: 100;
-  margin-top: auto;  /* Push footer to the bottom */
+  margin-top: auto;
 }
 
 footer.footer .list-inline-item a {
@@ -132,9 +132,9 @@ footer.footer .list-inline-item a:hover {
 /* Floating Support Icon */
 .support-icon {
   position: fixed;
-  bottom: 30px; /* Distance from the bottom of the screen */
-  right: 20px; /* Distance from the right of the screen */
-  background-color: #ff5722; /* Bright orange for visibility */
+  bottom: 30px;
+  right: 20px;
+  background-color: #ff5722;
   color: white;
   border-radius: 50%;
   width: 45px;
@@ -154,7 +154,7 @@ footer.footer .list-inline-item a:hover {
 }
 
 .support-icon i {
-  font-size: 20px; /* Larger icon size */
+  font-size: 20px;
 }
 
 /* Support Modal */

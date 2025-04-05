@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeModal = document.querySelector(".support-modal .close");
     const supportTicketForm = document.getElementById("support-ticket-form");
     const feedbackForm = document.getElementById("feedback-form");
-    const dynamicFlashMessagesContainer = document.querySelector(".dynamic-flash-messages-container"); // For dynamically added flash messages
+    const dynamicFlashMessagesContainer = document.querySelector(".dynamic-flash-messages-container");
 
     // Function to get CSRF token
     function getCSRFToken() {
@@ -73,16 +73,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then((response) => response.json().then((data) => ({ status: response.status, body: data })))
                 .then(({ status, body }) => {
                     if (status === 201) {
-                        console.log("Support ticket created successfully."); // Debugging log
                         displayFlashMessage(body.message, "success");
                         supportTicketForm.reset();
                     } else {
-                        console.error("Validation errors:", body.errors); // Debugging log
                         displayFlashMessage(body.message, "danger");
                     }
                 })
                 .catch((error) => {
-                    console.error("Error creating support ticket:", error); // Debugging log
                     displayFlashMessage("An error occurred. Please try again later.", "danger");
                 });
         });
@@ -105,16 +102,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then((response) => response.json().then((data) => ({ status: response.status, body: data })))
                 .then(({ status, body }) => {
                     if (status === 201) {
-                        console.log("Feedback submitted successfully."); // Debugging log
                         displayFlashMessage(body.message, "success");
                         feedbackForm.reset();
                     } else {
-                        console.error("Validation errors:", body.errors); // Debugging log
                         displayFlashMessage(body.message, "danger");
                     }
                 })
                 .catch((error) => {
-                    console.error("Error submitting feedback:", error); // Debugging log
                     displayFlashMessage("An error occurred. Please try again later.", "danger");
                 });
         });

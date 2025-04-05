@@ -16,7 +16,7 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Header Section (Integrated from Pollify) -->
+    <!-- Header Section -->
     <header class="header bg-light text-white">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between">
@@ -131,12 +131,24 @@
                         <i class="fas fa-file-alt"></i> Proposals
                     </a>
                 </h4>
+                {% if user.role == 'applicant' or user.role == 'evaluator' %}
+                <h4>
+                    <a href="{% url 'user_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
+                        <i class="fas fa-ticket-alt"></i> Tickets
+                    </a>
+                </h4>
+                {% endif %}
                 {% endif %}
 
                 {% if request.user.is_staff %}
                 <h4>
                     <a href="{% url 'evaluator_dashboard' %}" class="list-group-item list-group-item-action bg-light">
                         <i class="fas fa-check"></i> Evaluation
+                    </a>
+                </h4>
+                <h4>
+                    <a href="{% url 'admin_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
+                        <i class="fas fa-ticket-alt"></i> Tickets
                     </a>
                 </h4>
                 <h4>
@@ -150,6 +162,11 @@
                 <h4>
                     <a href="{% url 'log_list' %}" class="list-group-item list-group-item-action bg-light">
                         <i class="fas fa-user-shield"></i> Audit
+                    </a>
+                </h4>
+                <h4>
+                    <a href="{% url 'admin_faq_list' %}" class="list-group-item list-group-item-action bg-light">
+                        <i class="fas fa-user-shield"></i> FAQ
                     </a>
                 </h4>
                 {% endif %}
@@ -265,5 +282,6 @@
     <script src="{% static 'js/grant_call_favorites.js' %}"></script>
     <script src="{% static 'js/support.js' %}"></script>
     <script src="{% static 'js/grant_call_create.js' %}"></script>
+    <script src="{% static 'js/vote_type.js' %}"></script>
 </body>
 </html>
