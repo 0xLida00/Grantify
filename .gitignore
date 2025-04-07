@@ -39,6 +39,7 @@ db.sqlite3
 # Static files (build artifacts)
 staticfiles/
 static_root/
+media/
 
 # Local environment configuration
 .env

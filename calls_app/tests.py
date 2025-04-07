@@ -62,26 +62,26 @@ class CallsAppTests(TestCase):
         data = {
             "title": "New Grant Call",
             "description": "Description for new grant call.",
-            "deadline": "2025-12-31",  # Ensure the date is in YYYY-MM-DD format
+            "deadline": "2025-12-31",
             "eligibility": "Eligibility criteria.",
             "budget": 5000.00,
             "status": "open",
-            "questions-TOTAL_FORMS": "1",  # Required for formset
-            "questions-INITIAL_FORMS": "0",  # Required for formset
+            "questions-TOTAL_FORMS": "1",
+            "questions-INITIAL_FORMS": "0",
             "questions-MIN_NUM_FORMS": "0",
             "questions-MAX_NUM_FORMS": "1000",
             "questions-0-question_text": "What is your organization's mission?",
             "questions-0-question_type": "open",
         }
         response = self.client.post(self.create_url, data)
-        self.assertEqual(response.status_code, 302)  # Redirect after successful creation
+        self.assertEqual(response.status_code, 302)
         self.assertTrue(GrantCall.objects.filter(title="New Grant Call").exists())
 
     # Test grant call create view (non-admin user)
     def test_grant_call_create_view_non_admin_user(self):
         self.client.login(username="applicantuser", password="TestPassword123")
         response = self.client.get(self.create_url)
-        self.assertEqual(response.status_code, 403)  # Forbidden for non-admin users
+        self.assertEqual(response.status_code, 403)
 
     # Test grant call update view (admin user)
     def test_grant_call_update_view_admin_user(self):
@@ -89,19 +89,19 @@ class CallsAppTests(TestCase):
         data = {
             "title": "Updated Grant Call",
             "description": "Updated description.",
-            "deadline": "2025-12-31",  # Ensure the date is in YYYY-MM-DD format
+            "deadline": "2025-12-31",
             "eligibility": "Updated eligibility criteria.",
             "budget": 15000.00,
             "status": "closed",
-            "questions-TOTAL_FORMS": "1",  # Required for formset
-            "questions-INITIAL_FORMS": "0",  # Required for formset
+            "questions-TOTAL_FORMS": "1",
+            "questions-INITIAL_FORMS": "0",
             "questions-MIN_NUM_FORMS": "0",
             "questions-MAX_NUM_FORMS": "1000",
             "questions-0-question_text": "What is your organization's updated mission?",
             "questions-0-question_type": "open",
         }
         response = self.client.post(self.update_url, data)
-        self.assertEqual(response.status_code, 302)  # Redirect after successful update
+        self.assertEqual(response.status_code, 302)
         self.grant_call.refresh_from_db()
         self.assertEqual(self.grant_call.title, "Updated Grant Call")
         self.assertEqual(self.grant_call.status, "closed")
@@ -110,7 +110,7 @@ class CallsAppTests(TestCase):
     def test_grant_call_update_view_non_admin_user(self):
         self.client.login(username="applicantuser", password="TestPassword123")
         response = self.client.get(self.update_url)
-        self.assertEqual(response.status_code, 403)  # Forbidden for non-admin users
+        self.assertEqual(response.status_code, 403)
 
     # Test grant call delete confirmation page (admin user)
     def test_grant_call_delete_confirmation_page_admin_user(self):
@@ -124,24 +124,25 @@ class CallsAppTests(TestCase):
     def test_grant_call_delete_view_admin_user(self):
         self.client.login(username="staffuser", password="TestPassword123")
         response = self.client.post(self.delete_url)
-        self.assertEqual(response.status_code, 302)  # Redirect after successful deletion
+        self.assertEqual(response.status_code, 302)
         self.assertFalse(GrantCall.objects.filter(pk=self.grant_call.pk).exists())
 
     # Test grant call delete view (non-admin user)
     def test_grant_call_delete_view_non_admin_user(self):
         self.client.login(username="applicantuser", password="TestPassword123")
         response = self.client.post(self.delete_url)
-        self.assertEqual(response.status_code, 403)  # Forbidden for non-admin users
+        self.assertEqual(response.status_code, 403)
 
     # Test applying to a grant call (applicant user)
     def test_apply_grant_call_applicant_user(self):
         self.client.login(username="applicantuser", password="TestPassword123")
-        response = self.client.post(self.apply_url)
-        self.assertEqual(response.status_code, 302)  # Redirect after successful application
+        response = self.client.post(self.apply_url, data={"submit": "true"})
         self.assertRedirects(response, self.list_url)
+        response = self.client.post(self.apply_url, data={})
+        self.assertRedirects(response, self.apply_url)
 
     # Test applying to a grant call (non-applicant user)
     def test_apply_grant_call_non_applicant_user(self):
         self.client.login(username="staffuser", password="TestPassword123")
         response = self.client.post(self.apply_url)
-        self.assertEqual(response.status_code, 403)  # Forbidden for non-applicant users
+        self.assertEqual(response.status_code, 403)

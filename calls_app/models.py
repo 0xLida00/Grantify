@@ -17,7 +17,6 @@ class GrantCall(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="modified_grant_calls")
     modified_at = models.DateTimeField(auto_now=True)
-
     favorited_by = models.ManyToManyField(CustomUser, related_name="favorite_grants", blank=True)
 
     def __str__(self):
@@ -28,10 +27,17 @@ class GrantQuestion(models.Model):
     QUESTION_TYPE_CHOICES = (
         ('open', 'Open-Ended'),
         ('multiple_choice', 'Multiple Choice'),
+        ('file_upload', 'File Upload'),
     )
     grant_call = models.ForeignKey(GrantCall, on_delete=models.CASCADE, related_name="questions")
     question_text = models.CharField(max_length=255)
     question_type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='open')
+    choices_text = models.TextField(blank=True, null=True, help_text="Enter one choice per line (only for multiple-choice questions).")
+
+    def get_choices(self):
+        if self.choices_text:
+            return [choice.strip() for choice in self.choices_text.splitlines() if choice.strip()]
+        return []
 
     def __str__(self):
         return self.question_text
@@ -44,9 +50,6 @@ class GrantChoice(models.Model):
     def __str__(self):
         return self.choice_text
     
-
-from django.db import models
-from accounts_app.models import CustomUser
 
 class GrantResponse(models.Model):
     question = models.ForeignKey(GrantQuestion, on_delete=models.CASCADE, related_name="responses")

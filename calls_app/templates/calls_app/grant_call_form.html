@@ -14,20 +14,45 @@
             {% for question_form in question_formset %}
             <div class="card mb-3 question-form">
                 <div class="card-body">
-                    {{ question_form.as_p }}
-
-                    {% if question_form.instance.question_type == "multiple_choice" %}
-                    <h5>Choices</h5>
-                    {{ choice_formsets|length }}
-                    <div class="choices-container">
-                        {% for choice_form in choice_formsets %}
-                        <div class="form-group">
-                            {{ choice_form.as_p }}
+                    <!-- Display the question form -->
+                    <div class="mb-3">
+                        {{ question_form.id }}
+                        {{ question_form.question_text.label_tag }}
+                        {{ question_form.question_text }}
+                        {% if question_form.question_text.errors %}
+                        <div class="text-danger">
+                            {% for error in question_form.question_text.errors %}
+                            <small>{{ error }}</small><br>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
-                    <button type="button" class="btn btn-success add-choice">Add Choice</button>
-                    {% endif %}
+                    <div class="mb-3">
+                        {{ question_form.question_type.label_tag }}
+                        {{ question_form.question_type }}
+                        {% if question_form.question_type.errors %}
+                        <div class="text-danger">
+                            {% for error in question_form.question_type.errors %}
+                            <small>{{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+        
+                    <!-- Choices Section (Hidden by Default) -->
+                    <div class="choices-section" style="display: none;">
+                        <h5>Choices</h5>
+                        {{ question_form.choices_text.label_tag }}
+                        {{ question_form.choices_text }}
+                        {% if question_form.choices_text.errors %}
+                        <div class="text-danger">
+                            {% for error in question_form.choices_text.errors %}
+                            <small>{{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Enter one choice per line (only for multiple-choice questions).</small>
+                    </div>
                 </div>
             </div>
             {% endfor %}
@@ -37,5 +62,6 @@
         <button type="submit" class="btn btn-primary">Save</button>
         <a href="{% url 'grant_call_list' %}" class="btn btn-secondary">Cancel</a>
     </form>
+    <br>
 </div>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser, MyModel
 
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'role', 'is_staff', 'is_active')
@@ -24,3 +24,8 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('username',)
 
 admin.site.register(CustomUser, CustomUserAdmin)
+
+# Register MyModel
+@admin.register(MyModel)
+class MyModelAdmin(admin.ModelAdmin):
+    list_display = ('name', 'image')

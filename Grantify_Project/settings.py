@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
+    'cloudinary',
     'django.contrib.staticfiles',
     'accounts_app',
     'calls_app',
@@ -77,6 +79,14 @@ REST_FRAMEWORK = {
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "bootstrap4")
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Set ASGI application
 ASGI_APPLICATION = "grantify_project.asgi.application"

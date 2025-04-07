@@ -12,7 +12,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path("", GrantCallListView.as_view(), name="grant_call_list"),  # Use the class-based view
+    path("", GrantCallListView.as_view(), name="grant_call_list"),
     path("create/", GrantCallCreateView.as_view(), name="grant_call_create"),
     path("<int:pk>/", GrantCallDetailView.as_view(), name="grant_call_detail"),
     path("<int:pk>/apply/", apply_grant_call, name="apply_grant_call"),

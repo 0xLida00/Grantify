@@ -22,19 +22,18 @@ logger = logging.getLogger(__name__)
 
 # Grant Call List View with Pagination and Filtering
 class GrantCallListView(ListView):
-    '''View for displaying a list of grant calls'''
     model = GrantCall
     template_name = "calls_app/grant_call_list.html"
     context_object_name = "grant_calls"
-    paginate_by = 5  # Show 5 grant calls per page
-    ordering = ["-created_at"]
+    paginate_by = 10
 
     def get_queryset(self):
-        queryset = GrantCall.objects.all()
+        queryset = GrantCall.objects.all().order_by('-created_at')
+        if self.request.user.is_authenticated and self.request.user.role == "applicant":
+            queryset = queryset.exclude(status="draft")
+
         filter_by = self.request.GET.get("filter_by", "").strip()
         value = self.request.GET.get("value", "").strip()
-        sort_by = self.request.GET.get("sort_by", "").strip()
-
         if filter_by and value:
             if filter_by == "status":
                 queryset = queryset.filter(status__icontains=value)
@@ -43,6 +42,7 @@ class GrantCallListView(ListView):
             elif filter_by == "created_by":
                 queryset = queryset.filter(created_by__username__icontains=value)
 
+        sort_by = self.request.GET.get("sort_by", "").strip()
         if sort_by == "newest":
             queryset = queryset.order_by("-created_at")
         elif sort_by == "oldest":
@@ -56,6 +56,20 @@ class GrantCallListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+
+        paginator = Paginator(queryset, self.paginate_by)
+        page = self.request.GET.get("page")
+
+        try:
+            grant_calls = paginator.page(page)
+        except PageNotAnInteger:
+            grant_calls = paginator.page(1)
+        except EmptyPage:
+            grant_calls = paginator.page(paginator.num_pages)
+
+        context["grant_calls"] = grant_calls
+        context["page_obj"] = grant_calls
         context["filter_by"] = self.request.GET.get("filter_by", "")
         context["value"] = self.request.GET.get("value", "")
         context["sort_by"] = self.request.GET.get("sort_by", "")
@@ -64,7 +78,6 @@ class GrantCallListView(ListView):
 
 # Grant Call Create View
 class GrantCallCreateView(LoginRequiredMixin, CreateView):
-    '''View for creating a grant call'''
     model = GrantCall
     form_class = GrantCallForm
     template_name = "calls_app/grant_call_form.html"
@@ -78,24 +91,24 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context["question_formset"] = GrantQuestionFormSet(self.request.POST)
+            context["question_formset"] = GrantQuestionFormSet(self.request.POST, instance=self.object)
             context["choice_formsets"] = [
-                GrantChoiceFormSet(self.request.POST, instance=question_form.instance)
-                for question_form in context["question_formset"]
-                if question_form.instance.question_type == "multiple_choice"
+                GrantChoiceFormSet(self.request.POST, instance=question_form.instance, prefix=f"choices_{index}")
+                for index, question_form in enumerate(context["question_formset"])
             ]
         else:
-            context["question_formset"] = GrantQuestionFormSet()
+            context["question_formset"] = GrantQuestionFormSet(instance=self.object)
             context["choice_formsets"] = [
-                GrantChoiceFormSet(instance=question_form.instance)
-                for question_form in context["question_formset"]
-                if question_form.instance.question_type == "multiple_choice"
+                GrantChoiceFormSet(instance=question_form.instance, prefix=f"choices_{index}")
+                for index, question_form in enumerate(context["question_formset"])
             ]
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
         question_formset = context["question_formset"]
+        choice_formsets = context["choice_formsets"]
+
         if form.is_valid() and question_formset.is_valid():
             grant_call = form.save(commit=False)
             grant_call.created_by = self.request.user
@@ -104,14 +117,12 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
             question_formset.instance = grant_call
             questions = question_formset.save()
 
-            # Handle choices for multiple-choice questions
-            for question in questions:
+            for question, choice_formset in zip(questions, choice_formsets):
                 if question.question_type == "multiple_choice":
-                    choice_formset = GrantChoiceFormSet(self.request.POST, instance=question)
+                    choice_formset.instance = question
                     if choice_formset.is_valid():
                         choice_formset.save()
 
-            # Log the action
             LogEntry.objects.create(
                 user=self.request.user,
                 action="Grant Call Created",
@@ -143,12 +154,14 @@ class GrantCallDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         grant_call = self.get_object()
-        context["questions"] = grant_call.questions.all()
+
+        context["questions"] = grant_call.questions.prefetch_related("choices").all()
+
         return context
 
+# Grant Call Application View
 @login_required
 def apply_grant_call(request, pk):
-    '''View for applying to a grant call'''
     if request.user.role != 'applicant':
         return HttpResponseForbidden()
 
@@ -158,10 +171,8 @@ def apply_grant_call(request, pk):
         messages.error(request, "This grant call is not open for applications.")
         return redirect("grant_call_list")
 
-    # Fetch the questions for the grant call
     questions = grant_call.questions.all()
 
-    # Prepopulate the form with existing responses
     initial_data = {}
     for question in questions:
         try:
@@ -173,7 +184,6 @@ def apply_grant_call(request, pk):
     if request.method == 'POST':
         form = ApplicationForm(request.POST, request.FILES, questions=questions, initial=initial_data)
         if form.is_valid():
-            # Save the applicant's responses
             for question in questions:
                 response_text = form.cleaned_data.get(f'question_{question.id}_response')
                 response_file = form.cleaned_data.get(f'question_{question.id}_file')
@@ -185,10 +195,9 @@ def apply_grant_call(request, pk):
                 response.response = response_text
                 if response_file:
                     response.file = response_file
-                response.is_final_submission = 'submit' in request.POST  # Mark as final submission if "Submit" is clicked
+                response.is_final_submission = 'submit' in request.POST
                 response.save()
 
-            # Log the action
             LogEntry.objects.create(
                 user=request.user,
                 action="Grant Call Applied",
@@ -198,7 +207,6 @@ def apply_grant_call(request, pk):
                 source="User",
             )
 
-            # Create a notification
             if 'submit' in request.POST:
                 Notification.objects.create(
                     user=request.user,
@@ -222,7 +230,6 @@ def apply_grant_call(request, pk):
 # Toggle Favorite View
 @login_required
 def toggle_favorite(request, pk):
-    '''View for toggling favorite status of a grant call'''
     if request.user.role != 'applicant':
         return JsonResponse({"error": "You do not have permission to perform this action."}, status=403)
 
@@ -234,7 +241,6 @@ def toggle_favorite(request, pk):
         grant_call.favorited_by.remove(request.user)
         is_favorited = False
 
-        # Log the action
         LogEntry.objects.create(
             user=request.user,
             action="Grant Call Unfavorited",
@@ -247,7 +253,6 @@ def toggle_favorite(request, pk):
         grant_call.favorited_by.add(request.user)
         is_favorited = True
 
-        # Log the action
         LogEntry.objects.create(
             user=request.user,
             action="Grant Call Favorited",
@@ -262,7 +267,6 @@ def toggle_favorite(request, pk):
 
 # Favorite Grant Calls View
 class FavoriteGrantCallsView(LoginRequiredMixin, ListView):
-    '''View for displaying grant calls favorited by the user'''
     model = GrantCall
     template_name = "calls_app/favorite_grant_calls.html"
     context_object_name = "favorite_grant_calls"
@@ -275,7 +279,6 @@ class FavoriteGrantCallsView(LoginRequiredMixin, ListView):
 
 # Grant Call Update View
 class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    '''View for updating a grant call'''
     model = GrantCall
     form_class = GrantCallForm
     template_name = "calls_app/grant_call_form.html"
@@ -289,36 +292,22 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
             context["question_formset"] = GrantQuestionFormSet(self.request.POST, instance=self.get_object())
-            context["choice_formsets"] = [
-                GrantChoiceFormSet(self.request.POST, instance=question_form.instance)
-                for question_form in context["question_formset"]
-            ]
         else:
             context["question_formset"] = GrantQuestionFormSet(instance=self.get_object())
-            context["choice_formsets"] = [
-                GrantChoiceFormSet(instance=question_form.instance)
-                for question_form in context["question_formset"]
-            ]
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
         question_formset = context["question_formset"]
+
         if form.is_valid() and question_formset.is_valid():
             grant_call = form.save(commit=False)
-            grant_call.created_by = self.request.user
+            grant_call.modified_by = self.request.user
             grant_call.save()
 
             question_formset.instance = grant_call
-            questions = question_formset.save()
+            question_formset.save()
 
-            for question_form, choice_formset in zip(context["question_formset"], context["choice_formsets"]):
-                if question_form.cleaned_data.get("question_type") == "multiple_choice":
-                    choice_formset.instance = question_form.instance
-                    if choice_formset.is_valid():
-                        choice_formset.save()
-
-            # Log the action
             LogEntry.objects.create(
                 user=self.request.user,
                 action="Grant Call Updated",
@@ -337,7 +326,6 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 # Grant Call Delete View
 class GrantCallDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    '''View for deleting a grant call'''
     model = GrantCall
     template_name = "calls_app/grant_call_confirm_delete.html"
     success_url = reverse_lazy("grant_call_list")
@@ -345,12 +333,11 @@ class GrantCallDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         return self.request.user.role in ["admin", "org"]
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         grant_call = self.get_object()
 
-        # Log the action
         LogEntry.objects.create(
-            user=request.user,
+            user=self.request.user,
             action="Grant Call Deleted",
             object_repr=str(grant_call),
             change_message=f"Grant call '{grant_call.title}' was deleted.",
@@ -359,20 +346,19 @@ class GrantCallDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         )
 
         Notification.objects.create(
-            user=request.user,
+            user=self.request.user,
             notification_type="in_app",
             message=f"Grant call '{grant_call.title}' has been deleted.",
             is_read=False,
         )
 
-        messages.success(request, "Grant call deleted successfully!")
-        return super().delete(request, *args, **kwargs)
+        messages.success(self.request, "Grant call deleted successfully!")
+        return super().form_valid(form)
 
 
-# Grant Question Create View (Optional)
+# Question Addition View
 @login_required
 def add_question(request, grant_call_id):
-    '''View for adding a question to a grant call'''
     grant_call = get_object_or_404(GrantCall, id=grant_call_id)
     if request.method == "POST":
         form = GrantQuestionForm(request.POST)

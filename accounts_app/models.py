@@ -51,3 +51,11 @@ class CustomUser(AbstractUser):
                         img.save(img_path)
             except Exception as e:
                 print(f"Error processing profile picture: {e}")
+
+
+class MyModel(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='images/')
+
+    def __str__(self):
+        return self.name

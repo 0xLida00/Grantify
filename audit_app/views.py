@@ -8,17 +8,14 @@ from .models import LogEntry
 def log_list(request):
     logs = LogEntry.objects.all().order_by('-created_at')
 
-    # Filtering by log level
     log_level = request.GET.get('log_level')
     if log_level:
         logs = logs.filter(log_level=log_level)
 
-    # Filtering by user
     user_id = request.GET.get('user')
     if user_id:
         logs = logs.filter(user_id=user_id)
 
-    # Pagination: 25 logs per page
     paginator = Paginator(logs, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)

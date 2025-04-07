@@ -35,20 +35,20 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Questions</h5>
-            <ul class="list-group">
+            <ol>
                 {% for question in grant_call.questions.all %}
-                <li class="list-group-item">
+                <li class="mb-4">
                     <strong>{{ question.question_text }}</strong>
-                    {% if question.question_type == "multiple_choice" and question.choices.exists %}
+                    {% if question.question_type == "multiple_choice" %}
                     <ul class="mt-2">
-                        {% for choice in question.choices.all %}
-                        <li>{{ choice.choice_text }}</li>
+                        {% for choice in question.get_choices %}
+                        <li>{{ choice }}</li>
                         {% endfor %}
                     </ul>
                     {% endif %}
                 </li>
                 {% endfor %}
-            </ul>
+            </ol>
         </div>
     </div>
     {% else %}

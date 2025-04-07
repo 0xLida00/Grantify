@@ -5,6 +5,7 @@ Automat==24.8.1
 cffi==1.17.1
 channels==4.2.0
 channels_redis==4.2.1
+cloudinary
 constantly==23.10.4
 crispy-bootstrap4==2024.10
 crispy-bootstrap5==2023.10
@@ -14,6 +15,7 @@ python-decouple
 dj-database-url==2.1.0
 Django==4.2.16
 django-crispy-forms==2.3
+django-cloudinary-storage
 djangorestframework==3.15.2
 python-dotenv
 gunicorn==21.2.0
