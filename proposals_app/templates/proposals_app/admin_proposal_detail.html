@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Proposal Details</h1>
+
+    <!-- Proposal Details -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Proposal: {{ proposal.title }}</h5>
+            <p><strong>Applicant:</strong> {{ proposal.applicant.username }}</p>
+            <p><strong>Grant Call:</strong> {{ proposal.grant_call }}</p>
+            <p><strong>Status:</strong> 
+                <span class="badge 
+                    {% if proposal.status == 'draft' %}badge-secondary
+                    {% elif proposal.status == 'submitted' %}badge-primary
+                    {% elif proposal.status == 'under_review' %}badge-warning
+                    {% elif proposal.status == 'accepted' %}badge-success
+                    {% elif proposal.status == 'rejected' %}badge-danger
+                    {% else %}badge-light{% endif %}">
+                    {{ proposal.get_status_display }}
+                </span>
+            </p>
+            <p><strong>Submitted At:</strong> {{ proposal.submitted_at }}</p>
+            <p><strong>Description:</strong> {{ proposal.description }}</p>
+        </div>
+    </div>
+
+    <!-- Responses -->
+    <h3 class="mt-4">Responses</h3>
+    {% for response in responses %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>{{ response.question.question_text }}</strong></p>
+            {% if response.file %}
+                <a href="{{ response.file.url }}" target="_blank">Download File</a>
+            {% else %}
+                <p>{{ response.response }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <a href="{% url 'proposals_app:admin_proposal_list' %}" class="btn btn-secondary mt-4">Back to List</a>
+</div>
+<br>
+{% endblock %}

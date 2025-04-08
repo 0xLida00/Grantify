@@ -15,12 +15,20 @@
         {% for evaluation in evaluations %}
         <tr>
             <td>{{ evaluation.proposal.title }}</td>
-            <td>{{ evaluation.get_status_display }}</td>
+            <td>
+                <span class="badge 
+                {% if evaluation.status == 'pending' %}badge-secondary
+                {% elif evaluation.status == 'in_progress' %}badge-warning
+                {% elif evaluation.status == 'completed' %}badge-success
+                {% endif %}">
+                {{ evaluation.get_status_display }}
+            </span>
+            </td>
             <td>
                 {% if evaluation.status == 'pending' or evaluation.status == 'in_progress' %}
                 <a href="{% url 'submit_evaluation' evaluation.pk %}" class="btn btn-primary btn-sm">Evaluate</a>
                 {% else %}
-                Completed
+                <span class="badge badge-secondary">Evaluated</span>
                 {% endif %}
             </td>
         </tr>

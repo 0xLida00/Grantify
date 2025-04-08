@@ -70,17 +70,17 @@ def user_login(request):
 
 def user_logout(request):
     '''View for user logout'''
-    user = request.user
-    logout(request)
+    if request.user.is_authenticated:
+        LogEntry.objects.create(
+            user=request.user,
+            action="User Logged Out",
+            object_repr=str(request.user),
+            change_message=f"User '{request.user.username}' logged out successfully.",
+            log_level="INFO",
+            source="User",
+        )
 
-    LogEntry.objects.create(
-        user=user,
-        action="User Logged Out",
-        object_repr=str(user),
-        change_message=f"User '{user.username}' logged out successfully.",
-        log_level="INFO",
-        source="User",
-    )
+    logout(request)
 
     messages.success(request, "You have been logged out.")
     return redirect('home')

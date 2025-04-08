@@ -13,6 +13,7 @@ class Proposal(models.Model):
     )
     grant_call = models.ForeignKey(GrantCall, on_delete=models.CASCADE, related_name="proposals")
     applicant = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="proposals")
+    evaluator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_proposals")
     title = models.CharField(max_length=255)
     description = models.TextField()
     document = models.FileField(upload_to="proposals/")

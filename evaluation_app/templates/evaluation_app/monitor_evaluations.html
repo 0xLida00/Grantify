@@ -3,13 +3,43 @@
 
 {% block content %}
 <h1>Monitor Evaluations</h1>
-<table class="table">
-    <thead>
+
+<!-- Filter Form -->
+<form method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-4">
+            <select name="status" class="form-control mb-2">
+                <option value="">All Statuses</option>
+                <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
+                <option value="in_progress" {% if status_filter == "in_progress" %}selected{% endif %}>In Progress</option>
+                <option value="completed" {% if status_filter == "completed" %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="evaluator" class="form-control mb-2">
+                <option value="">All Evaluators</option>
+                {% for evaluator in evaluators %}
+                <option value="{{ evaluator.id }}" {% if evaluator.id|stringformat:"s" == evaluator_filter %}selected{% endif %}>
+                    {{ evaluator.username }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </div>
+</form>
+
+<!-- Evaluations Table -->
+<table class="table table-bordered table-hover">
+    <thead class="thead-light">
         <tr>
             <th>Proposal</th>
             <th>Evaluator</th>
             <th>Score</th>
             <th>Status</th>
+            <th>Feedback</th>
             <th>Evaluated At</th>
         </tr>
     </thead>
@@ -19,10 +49,71 @@
             <td>{{ evaluation.proposal.title }}</td>
             <td>{{ evaluation.evaluator.username }}</td>
             <td>{{ evaluation.score }}</td>
-            <td>{{ evaluation.get_status_display }}</td>
+            <td>
+                <span class="badge 
+                    {% if evaluation.status == 'pending' %}badge-secondary
+                    {% elif evaluation.status == 'in_progress' %}badge-warning
+                    {% elif evaluation.status == 'completed' %}badge-success
+                    {% endif %}">
+                    {{ evaluation.get_status_display }}
+                </span>
+            </td>
+            <td>
+                <div class="d-flex justify-content-between">
+                    <span>
+                        {% if evaluation.feedback %}
+                        {{ evaluation.feedback|slice:":20" }}
+                        {% else %}
+                        No feedback provided
+                        {% endif %}
+                    </span>
+                    <a href="{% url 'feedback_detail' evaluation.pk %}" class="btn btn-primary btn-sm">View</a>
+                </div>
+            </td>
             <td>{{ evaluation.evaluated_at }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+{% if evaluations|length == 0 %}
+<p class="text-center mt-4">No evaluations found.</p>
+{% endif %}
+
+<!-- Pagination Controls -->
+<div class="d-flex justify-content-center">
+    <nav>
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
 {% endblock %}

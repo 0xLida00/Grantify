@@ -2,31 +2,84 @@
 {% load static %}
 
 {% block content %}
-<h1>Your Proposals</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Grant Call</th>
-            <th>Status</th>
-            <th>Submitted At</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for proposal in proposals %}
-        <tr>
-            <td>{{ proposal.title }}</td>
-            <td>{{ proposal.grant_call }}</td>
-            <td>{{ proposal.get_status_display }}</td>
-            <td>{{ proposal.submitted_at }}</td>
-            <td>
-                <a href="{% url 'proposal_detail' proposal.pk %}" class="btn btn-info btn-sm">View</a>
-                <a href="{% url 'proposal_update' proposal.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                <a href="{% url 'proposal_delete' proposal.pk %}" class="btn btn-danger btn-sm">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container">
+    <h1>Your Proposals</h1>
+
+    <!-- Proposals Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Grant Call</th>
+                <th>Status</th>
+                <th>Submitted At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proposal in page_obj %}
+            <tr>
+                <td>{{ proposal.title }}</td>
+                <td>{{ proposal.grant_call }}</td>
+                <td>
+                    <span class="badge 
+                        {% if proposal.status == 'draft' %}badge-secondary
+                        {% elif proposal.status == 'submitted' %}badge-primary
+                        {% elif proposal.status == 'under_review' %}badge-warning
+                        {% elif proposal.status == 'accepted' %}badge-success
+                        {% elif proposal.status == 'rejected' %}badge-danger
+                        {% else %}badge-light{% endif %}">
+                        {{ proposal.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ proposal.submitted_at }}</td>
+                <td>
+                    <a href="{% url 'proposals_app:proposal_detail' proposal.pk %}" class="btn btn-info btn-sm">View</a>
+                    {% if proposal.status == "draft" %}
+                    <a href="{% url 'proposals_app:proposal_update' proposal.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'proposals_app:proposal_delete' proposal.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-center">
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
 {% endblock %}

@@ -4,6 +4,18 @@
 {% block content %}
 <h1>Submit Evaluation</h1>
 <h3>Proposal: {{ evaluation.proposal.title }}</h3>
+<p><strong>Description:</strong> {{ evaluation.proposal.description }}</p>
+
+<h4>Questions and Answers</h4>
+<ul>
+    {% for item in questions_with_responses %}
+    <li>
+        <strong>{{ item.question.question_text }}</strong><br>
+        Answer: {{ item.response.response|default:"No response provided" }}
+    </li>
+    {% endfor %}
+</ul>
+
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

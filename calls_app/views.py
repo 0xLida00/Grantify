@@ -13,7 +13,8 @@ from django.http import HttpResponseForbidden, JsonResponse
 from alerts_app.models import Notification
 from .models import GrantCall, GrantQuestion, GrantChoice, GrantResponse
 from .forms import GrantCallForm, GrantQuestionForm, GrantChoiceForm, GrantQuestionFormSet, ApplicationForm, GrantChoiceFormSet
-from audit_app.models import LogEntry 
+from audit_app.models import LogEntry
+from proposals_app.models import Proposal
 
 # Logger for debugging (optional)
 import logging
@@ -171,16 +172,31 @@ def apply_grant_call(request, pk):
         messages.error(request, "This grant call is not open for applications.")
         return redirect("grant_call_list")
 
+    # Retrieve or create a Proposal object for the applicant and grant call
+    proposal, created = Proposal.objects.get_or_create(
+        grant_call=grant_call,
+        applicant=request.user,
+        defaults={
+            'title': f"Proposal for {grant_call.title}",
+            'description': '',
+            'status': 'draft',
+        }
+    )
+
+    # Retrieve all questions for the grant call
     questions = grant_call.questions.all()
 
+    # Populate initial data with saved responses
     initial_data = {}
     for question in questions:
         try:
             response = GrantResponse.objects.get(question=question, user=request.user, grant_call=grant_call)
-            initial_data[f'question_{question.id}_response'] = response.response
+            initial_data[f'question_{question.id}_response'] = response.response  # Text response
+            initial_data[f'question_{question.id}_file'] = response.file  # File response (if applicable)
         except GrantResponse.DoesNotExist:
             pass
 
+    # Handle form submission
     if request.method == 'POST':
         form = ApplicationForm(request.POST, request.FILES, questions=questions, initial=initial_data)
         if form.is_valid():
@@ -198,6 +214,16 @@ def apply_grant_call(request, pk):
                 response.is_final_submission = 'submit' in request.POST
                 response.save()
 
+            # Update the Proposal object
+            if 'submit' in request.POST:
+                proposal.status = 'submitted'
+                messages.success(request, f"You have successfully submitted your application for the grant call: {grant_call.title}")
+            else:
+                messages.success(request, "Your progress has been saved. You can return to complete your application later.")
+            proposal.description = form.cleaned_data.get('description', proposal.description)
+            proposal.save()
+
+            # Log the action
             LogEntry.objects.create(
                 user=request.user,
                 action="Grant Call Applied",
@@ -207,6 +233,7 @@ def apply_grant_call(request, pk):
                 source="User",
             )
 
+            # Send a notification if the application is submitted
             if 'submit' in request.POST:
                 Notification.objects.create(
                     user=request.user,
@@ -214,17 +241,17 @@ def apply_grant_call(request, pk):
                     message=f"You have successfully submitted your application for the grant call: '{grant_call.title}'.",
                     is_read=False,
                 )
-                messages.success(request, f"You have successfully submitted your application for the grant call: {grant_call.title}")
                 return redirect("grant_call_list")
             else:
-                messages.success(request, "Your progress has been saved. You can return to complete your application later.")
                 return redirect("apply_grant_call", pk=grant_call.pk)
     else:
+        # Pre-fill the form with initial data
         form = ApplicationForm(questions=questions, initial=initial_data)
 
     return render(request, 'calls_app/apply_grant_call.html', {
         'grant_call': grant_call,
         'form': form,
+        'proposal': proposal,
     })
 
 # Toggle Favorite View

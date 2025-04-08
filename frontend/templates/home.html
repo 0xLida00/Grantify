@@ -51,12 +51,16 @@
     </div>
     <div class="col-md-4">
       <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <i class="bi bi-file-earmark-text display-4 text-success"></i>
-          <h4 class="mt-3">Proposals</h4>
-          <p>Create, submit, and track your grant proposals with ease.</p>
-          <a href="{% url 'proposal_list' %}" class="btn btn-outline-success">Manage Proposals</a>
-        </div>
+          <div class="card-body text-center">
+              <i class="bi bi-file-earmark-text display-4 text-success"></i>
+              <h4 class="mt-3">Proposals</h4>
+              <p>Create, submit, and track your grant proposals with ease.</p>
+              {% if user.is_authenticated %}
+                  <a href="{% url 'proposals_app:proposal_list' %}" class="btn btn-outline-success">Manage Proposals</a>
+              {% else %}
+                  <a href="{% url 'login' %}" class="btn btn-outline-success">Manage Proposals</a>
+              {% endif %}
+          </div>
       </div>
     </div>
     <div class="col-md-4">

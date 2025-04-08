@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Apply for Grant Call: {{ grant_call.title }}</h1>
+    <h1 class="mb-4">Edit Proposal: {{ proposal.title }}</h1>
 
     <!-- Grant Call Details -->
     <div class="card mb-4 shadow-sm">
@@ -52,6 +52,9 @@
                     </div>
                     {% elif field.widget.input_type == "file" %}
                     <div class="form-control">
+                        {% if field.value %}
+                            <a href="{{ field.value.url }}" target="_blank">Download File</a>
+                        {% endif %}
                         {{ field }}
                     </div>
                     {% else %}
@@ -67,9 +70,8 @@
 
         <!-- Form Buttons -->
         <div class="d-flex justify-content-between mt-4">
-            <button type="submit" name="save" class="btn btn-secondary">Save Progress</button>
-            <a href="{% url 'grant_call_list' %}" class="btn btn-secondary mx-2">Back</a>
-            <button type="submit" name="submit" class="btn btn-primary">Submit Application</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'proposals_app:proposal_list' %}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
     <br>

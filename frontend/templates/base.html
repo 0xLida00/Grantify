@@ -127,48 +127,67 @@
 
                 {% if user.is_authenticated %}
                 <h4>
-                    <a href="{% url 'proposal_list' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-file-alt"></i> Proposals
-                    </a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'proposals_app:admin_proposal_list' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-file-alt"></i> Proposals
+                        </a>
+                    {% else %}
+                        <a href="{% url 'proposals_app:proposal_list' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-file-alt"></i> My Proposals
+                        </a>
+                    {% endif %}
                 </h4>
+
+                <!-- Evaluator-Specific Links -->
+                {% if user.role == 'evaluator' %}
+                    <h4>
+                        <a href="{% url 'evaluator_dashboard' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-check"></i> My Evaluations
+                        </a>
+                    </h4>
+                {% endif %}
+
+                <!-- Tickets -->
                 {% if user.role == 'applicant' or user.role == 'evaluator' %}
-                <h4>
-                    <a href="{% url 'user_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-ticket-alt"></i> Tickets
-                    </a>
-                </h4>
-                {% endif %}
-                {% endif %}
-
-                {% if request.user.is_staff %}
-                <h4>
-                    <a href="{% url 'evaluator_dashboard' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-check"></i> Evaluation
-                    </a>
-                </h4>
-                <h4>
-                    <a href="{% url 'admin_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-ticket-alt"></i> Tickets
-                    </a>
-                </h4>
-                <h4>
-                    <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-chart-bar"></i> Reports
-                    </a>
-                </h4>
+                    <h4>
+                        <a href="{% url 'user_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-ticket-alt"></i> Tickets
+                        </a>
+                    </h4>
                 {% endif %}
 
-                {% if request.user.is_superuser %}
-                <h4>
-                    <a href="{% url 'log_list' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-user-shield"></i> Audit
-                    </a>
-                </h4>
-                <h4>
-                    <a href="{% url 'admin_faq_list' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-user-shield"></i> FAQ
-                    </a>
-                </h4>
+                <!-- Staff-Specific Links -->
+                {% if user.is_staff %}
+                    <h4>
+                        <a href="{% url 'monitor_evaluations' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-check"></i> Evaluations
+                        </a>
+                    </h4>
+                    <h4>
+                        <a href="{% url 'admin_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-ticket-alt"></i> Tickets
+                        </a>
+                    </h4>
+                    <h4>
+                        <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </a>
+                    </h4>
+                {% endif %}
+
+                <!-- Superuser-Specific Links -->
+                {% if user.is_superuser %}
+                    <h4>
+                        <a href="{% url 'log_list' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-user-shield"></i> Audit
+                        </a>
+                    </h4>
+                    <h4>
+                        <a href="{% url 'admin_faq_list' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-question-circle"></i> FAQ
+                        </a>
+                    </h4>
+                {% endif %}
                 {% endif %}
             </div>
         </div>        
