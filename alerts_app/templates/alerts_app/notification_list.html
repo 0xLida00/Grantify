@@ -2,9 +2,13 @@
 {% load static %}
 
 {% block content %}
-<h1>Notifications</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Notifications</h1>
+    <a href="{% url 'notification_preferences' %}" class="btn btn-secondary">Manage Notification Preferences</a>
+</div>
+
 <ul class="list-group">
-    {% for notification in notifications %}
+    {% for notification in page_obj %}
     <li class="list-group-item {% if not notification.is_read %}list-group-item-warning{% endif %}">
         <p>{{ notification.message }}</p>
         <small>{{ notification.created_at }}</small>
@@ -19,8 +23,40 @@
     {% endfor %}
 </ul>
 
-<!-- Link to Notification Preferences -->
-<div class="text-center mt-4">
-    <a href="{% url 'notification_preferences' %}" class="btn btn-secondary">Manage Notification Preferences</a>
+<!-- Pagination Controls -->
+<div class="d-flex justify-content-center mt-4">
+    <nav>
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock %}

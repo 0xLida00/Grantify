@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Dynamic flash messages container not found in the DOM.");
         }
     
-        // Automatically remove the message after 5 seconds
         setTimeout(() => {
             alertDiv.remove();
         }, 5000);

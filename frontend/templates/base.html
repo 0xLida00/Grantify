@@ -86,6 +86,9 @@
                             </li>
                             {% endif %}
                             <li class="nav-item">
+                                <a class="nav-link" href="{% url 'todo_list' %}">To-Do List</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'profile' user.username %}">Profile</a>
                             </li>
                             <li class="nav-item">
@@ -185,6 +188,11 @@
                     <h4>
                         <a href="{% url 'admin_faq_list' %}" class="list-group-item list-group-item-action bg-light">
                             <i class="fas fa-question-circle"></i> FAQ
+                        </a>
+                    </h4>
+                    <h4>
+                        <a href="{% url 'feedback_list' %}" class="list-group-item list-group-item-action bg-light">
+                            <i class="fas fa-comments"></i> Feedbacks
                         </a>
                     </h4>
                 {% endif %}
@@ -296,10 +304,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/base.js' %}"></script>
     <script src="{% static 'js/grant_call_form.js' %}"></script>
     <script src="{% static 'js/grant_call_favorites.js' %}"></script>
     <script src="{% static 'js/support.js' %}"></script>
     <script src="{% static 'js/vote_type.js' %}"></script>
+    <script src="{% static 'js/todo.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+    <script src="{% static 'js/generate_report.js' %}"></script>
 </body>
 </html>

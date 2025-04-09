@@ -2,33 +2,29 @@
 {% load static %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Manage FAQs</h1>
-    <a href="{% url 'admin_faq_create' %}" class="btn btn-primary">Create FAQ</a>
-</div>
+<h1>All Feedbacks</h1>
+
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Question</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>User</th>
+            <th>Message</th>
+            <th>Created At</th>
         </tr>
     </thead>
     <tbody>
-        {% for faq in page_obj %}
+        {% for feedback in page_obj %}
         <tr>
-            <td>{{ faq.id }}</td>
-            <td>{{ faq.question }}</td>
-            <td>{{ faq.status|capfirst }}</td>
+            <td>{{ feedback.user.username }}</td>
+            <td>{{ feedback.message|slice:":15" }}{% if feedback.message|length > 15 %}...{% endif %}</td>
+            <td>{{ feedback.created_at }}</td>
             <td>
-                <a href="{% url 'admin_faq_edit' faq.id %}" class="btn btn-sm btn-warning">Edit</a>
-                <a href="{% url 'admin_faq_delete' faq.id %}" class="btn btn-sm btn-danger">Delete</a>
+                <a href="{% url 'support_feedback_detail' feedback.id %}" class="btn btn-sm btn-primary">View</a>
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4" class="text-center">No FAQs available.</td>
+            <td colspan="3" class="text-center">No feedbacks available.</td>
         </tr>
         {% endfor %}
     </tbody>

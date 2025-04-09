@@ -23,17 +23,12 @@ class SupportTicketForm(forms.ModelForm):
 class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
-        fields = ['message', 'rating']
+        fields = ['message']
         widgets = {
             'message': forms.Textarea(attrs={
                 'class': 'form-control',
                 'placeholder': 'Write your feedback here',
                 'rows': 4,
-            }),
-            'rating': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'max': 5,
             }),
         }
 

@@ -35,4 +35,45 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% if evaluations|length == 0 %}
+<p class="text-center mt-4">No evaluations found.</p>
+{% endif %}
+
+<!-- Pagination Controls -->
+<div class="d-flex justify-content-center mt-4">
+    <nav>
+        <ul class="pagination">
+            {% if evaluations.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ evaluations.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in evaluations.paginator.page_range %}
+                {% if evaluations.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > evaluations.number|add:"-2" and num < evaluations.number|add:"2" %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if evaluations.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ evaluations.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ evaluations.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
 {% endblock %}

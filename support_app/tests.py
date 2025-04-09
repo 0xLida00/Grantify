@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
-from .models import SupportTicket, Feedback, FAQ
+from .models import SupportTicket, Feedback, FAQ, ToDo
 from .forms import SupportTicketForm, FeedbackForm
 
 User = get_user_model()
@@ -268,3 +268,82 @@ class FAQVotingTest(TestCase):
         self.faq.refresh_from_db()
         self.assertEqual(self.faq.thumbs_up, 0)
         self.assertEqual(self.faq.thumbs_down, 1)
+
+# To-Do Model Tests
+class ToDoModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password123")
+        self.todo = ToDo.objects.create(
+            user=self.user,
+            title="Test Task",
+            description="This is a test task.",
+            completed=False,
+        )
+
+    # Test: To-Do creation
+    def test_todo_creation(self):
+        self.assertEqual(self.todo.title, "Test Task")
+        self.assertEqual(self.todo.description, "This is a test task.")
+        self.assertFalse(self.todo.completed)
+        self.assertEqual(str(self.todo), f"To-Do: {self.todo.title} (Pending)")
+
+    # Test: To-Do completion status
+    def test_todo_completion_status(self):
+        self.todo.completed = True
+        self.todo.save()
+        self.assertTrue(self.todo.completed)
+        self.assertEqual(str(self.todo), f"To-Do: {self.todo.title} (Completed)")
+
+
+# To-Do API Tests
+class ToDoAPITest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password123")
+        self.client.login(username="testuser", password="password123")
+        self.todo = ToDo.objects.create(
+            user=self.user,
+            title="Test Task",
+            description="This is a test task.",
+            completed=False,
+        )
+
+    # Test: Fetch to-do list
+    def test_fetch_todo_list(self):
+        response = self.client.get("/api/todos/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["title"], "Test Task")
+
+    # Test: Create a new to-do item
+    def test_create_todo_item(self):
+        data = {
+            "title": "New Task",
+            "description": "This is a new task.",
+            "completed": False,
+        }
+        response = self.client.post("/api/todos/", data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(ToDo.objects.count(), 2)
+        self.assertTrue(ToDo.objects.filter(title="New Task").exists())
+
+    # Test: Update a to-do item
+    def test_update_todo_item(self):
+        data = {
+            "completed": True,
+        }
+        response = self.client.put(f"/api/todos/{self.todo.id}/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.todo.refresh_from_db()
+        self.assertTrue(self.todo.completed)
+
+    # Test: Delete a to-do item
+    def test_delete_todo_item(self):
+        response = self.client.delete(f"/api/todos/{self.todo.id}/")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(ToDo.objects.count(), 0)
+
+    # Test: Unauthenticated user cannot access to-do list
+    def test_unauthenticated_user_cannot_access_todo_list(self):
+        self.client.logout()
+        response = self.client.get("/api/todos/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

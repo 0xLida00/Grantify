@@ -65,7 +65,7 @@ def monitor_evaluations(request):
 
     evaluators = CustomUser.objects.filter(is_staff=False)
 
-    paginator = Paginator(evaluations, 10)
+    paginator = Paginator(evaluations, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -94,6 +94,10 @@ def evaluator_dashboard(request):
     if status_filter:
         evaluations = evaluations.filter(status=status_filter)
 
+    paginator = Paginator(evaluations, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     LogEntry.objects.create(
         user=request.user,
         action="View Evaluator Dashboard",
@@ -104,7 +108,7 @@ def evaluator_dashboard(request):
     )
 
     return render(request, 'evaluation_app/evaluator_dashboard.html', {
-        'evaluations': evaluations,
+        'evaluations': page_obj,
         'status_filter': status_filter,
     })
 
