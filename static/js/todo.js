@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const todoList = document.getElementById('todo-list');
     const todoForm = document.getElementById('todo-form');
     const todoTitleInput = document.getElementById('todo-title');
-    const paginationNav = document.createElement('nav'); // Create a pagination container
+    const paginationNav = document.createElement('nav');
     paginationNav.className = 'mt-3';
-    todoList.parentNode.appendChild(paginationNav); // Append it below the to-do list
+    todoList.parentNode.appendChild(paginationNav);
 
     let currentPage = 1;
 
@@ -48,15 +48,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 });
 
-                // Update pagination controls
                 updatePagination(data);
             })
             .catch(error => console.error('Error fetching to-dos:', error));
     }
 
-    // Update pagination controls
     function updatePagination(data) {
-        paginationNav.innerHTML = ''; // Clear existing pagination
+        paginationNav.innerHTML = '';
 
         const pagination = document.createElement('ul');
         pagination.className = 'pagination justify-content-center';
@@ -84,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         paginationNav.appendChild(pagination);
 
-        // Add event listeners to pagination links
         pagination.querySelectorAll('.page-link').forEach(link => {
             link.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -110,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 if (response.ok) {
                     todoTitleInput.value = '';
-                    fetchTodos(currentPage); // Refresh the current page
+                    fetchTodos(currentPage);
                 } else {
                     console.error('Error adding to-do:', response);
                 }
@@ -128,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => {
                 if (response.ok) {
-                    fetchTodos(currentPage); // Refresh the current page
+                    fetchTodos(currentPage);
                 } else {
                     console.error('Error toggling to-do:', response);
                 }
@@ -146,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => {
                 if (response.ok) {
-                    fetchTodos(currentPage); // Refresh the current page
+                    fetchTodos(currentPage);
                 } else {
                     console.error('Error deleting to-do:', response);
                 }
@@ -158,5 +155,5 @@ document.addEventListener('DOMContentLoaded', function () {
         return csrfToken ? csrfToken.value : '';
     }
 
-    fetchTodos(); // Initial fetch
+    fetchTodos();
 });

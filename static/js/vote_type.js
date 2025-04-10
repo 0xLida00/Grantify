@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Function to get CSRF token
 function getCSRFToken() {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
     return csrfToken ? csrfToken.value : '';

@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const addQuestionButton = document.getElementById("add-question");
     const questionsContainer = document.getElementById("questions-container");
     const totalForms = document.querySelector("#id_questions-TOTAL_FORMS");
+    const saveButton = document.querySelector("button[type='submit']");
 
     if (!addQuestionButton || !questionsContainer || !totalForms) {
         console.error("Required elements for adding questions are missing.");
@@ -22,12 +23,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // Trigger the change event on page load to set the initial state
             questionTypeField.dispatchEvent(new Event("change"));
         }
     }
 
-    // Apply toggleChoicesSection to all existing question forms
     questionsContainer.querySelectorAll(".question-form").forEach(function (questionForm) {
         toggleChoicesSection(questionForm);
     });
@@ -36,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
     addQuestionButton.addEventListener("click", function () {
         const formCount = parseInt(totalForms.value, 10);
 
-        // Clone the last question form
         const lastForm = questionsContainer.lastElementChild;
         if (!lastForm) {
             console.error("No question form template found to clone.");
@@ -50,7 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
             input.name = name;
             input.id = id;
 
-            // Clear the value for new fields, but do not clear the hidden ID field
             if (!input.name.endsWith("-id")) {
                 input.value = "";
             }
@@ -59,7 +56,33 @@ document.addEventListener("DOMContentLoaded", function () {
         questionsContainer.appendChild(newForm);
         totalForms.value = formCount + 1;
 
-        // Apply toggleChoicesSection to the new question form
         toggleChoicesSection(newForm);
+    });
+
+    if (saveButton) {
+        saveButton.addEventListener("click", function (event) {
+            const form = saveButton.closest("form");
+            if (form) {
+                console.log("Form is being submitted...");
+            } else {
+                console.error("Form not found!");
+            }
+        });
+    }
+
+    // Function to highlight invalid fields dynamically
+    function highlightInvalidFields() {
+        document.querySelectorAll(".invalid-feedback").forEach(function (errorElement) {
+            const input = errorElement.previousElementSibling;
+            if (input) {
+                input.classList.add("is-invalid");
+            }
+        });
+    }
+
+    highlightInvalidFields();
+
+    document.querySelector("form").addEventListener("submit", function (event) {
+        setTimeout(highlightInvalidFields, 100);
     });
 });

@@ -4,60 +4,74 @@
 {% block content %}
 <div class="container">
     <h2>{% if grant_call %}Edit Grant Call{% else %}Create Grant Call{% endif %}</h2>
-    <form method="post">
+    <form method="post" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
-
+        
+        {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
         <h4>Questions</h4>
         {{ question_formset.management_form }}
         <div id="questions-container">
             {% for question_form in question_formset %}
             <div class="card mb-3 question-form">
                 <div class="card-body">
-                    <!-- Display the question form -->
-                    <div class="mb-3">
-                        {{ question_form.id }}
+                    <!-- Question Text -->
+                    <div class="form-group">
                         {{ question_form.question_text.label_tag }}
                         {{ question_form.question_text }}
                         {% if question_form.question_text.errors %}
-                        <div class="text-danger">
+                        <div class="invalid-feedback d-block">
                             {% for error in question_form.question_text.errors %}
                             <small>{{ error }}</small><br>
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
-                    <div class="mb-3">
+                    <!-- Question Type -->
+                    <div class="form-group">
                         {{ question_form.question_type.label_tag }}
                         {{ question_form.question_type }}
                         {% if question_form.question_type.errors %}
-                        <div class="text-danger">
+                        <div class="invalid-feedback d-block">
                             {% for error in question_form.question_type.errors %}
                             <small>{{ error }}</small><br>
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
-        
-                    <!-- Choices Section (Hidden by Default) -->
+                    <!-- Choices Section -->
                     <div class="choices-section" style="display: none;">
                         <h5>Choices</h5>
-                        {{ question_form.choices_text.label_tag }}
-                        {{ question_form.choices_text }}
-                        {% if question_form.choices_text.errors %}
-                        <div class="text-danger">
-                            {% for error in question_form.choices_text.errors %}
-                            <small>{{ error }}</small><br>
-                            {% endfor %}
+                        <div class="form-group">
+                            {{ question_form.choices_text.label_tag }}
+                            {{ question_form.choices_text }}
+                            {% if question_form.choices_text.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in question_form.choices_text.errors %}
+                                <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
                         <small class="form-text text-muted">Enter one choice per line (only for multiple-choice questions).</small>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-
+    
         <button type="button" class="btn btn-success" id="add-question">Add Question</button>
         <button type="submit" class="btn btn-primary">Save</button>
         <a href="{% url 'grant_call_list' %}" class="btn btn-secondary">Cancel</a>

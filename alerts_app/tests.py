@@ -7,7 +7,6 @@ User = get_user_model()
 
 class AlertsAppTestCase(TestCase):
     def setUp(self):
-        '''Create a test user, notification, and notification preference.'''
         self.user = User.objects.create_user(username='testuser', password='password123')
         self.client.login(username='testuser', password='password123')
 

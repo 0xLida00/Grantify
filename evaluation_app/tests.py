@@ -85,10 +85,10 @@ class EvaluationAppTests(TestCase):
             'score': 15,  # Invalid score
             'feedback': 'Invalid score test.'
         })
-        self.assertEqual(response.status_code, 200)  # Form should re-render with errors
+        self.assertEqual(response.status_code, 200)
         self.evaluation.refresh_from_db()
-        self.assertNotEqual(self.evaluation.score, 15)  # Score should not be updated
-        self.assertEqual(self.evaluation.status, 'pending')  # Status should remain unchanged
+        self.assertNotEqual(self.evaluation.score, 15)
+        self.assertEqual(self.evaluation.status, 'pending')
 
     def test_feedback_detail(self):
         self.evaluation.score = 9.0

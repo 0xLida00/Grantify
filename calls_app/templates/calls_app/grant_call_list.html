@@ -11,7 +11,6 @@
         {% endif %}
     </div>
     <br>
-
     <!-- Filter and Sorting Form -->
     <form method="get" class="mb-4">
         <div class="row g-3 align-items-center">
@@ -25,7 +24,6 @@
                     <option value="created_by" {% if filter_by == "created_by" %}selected{% endif %}>Created By</option>
                 </select>
             </div>
-    
             <!-- Sort by -->
             <div class="col-md-3">
                 <label for="sort_by" class="form-label">Sort By</label>
@@ -37,12 +35,10 @@
                     <option value="budget_low" {% if sort_by == "budget_low" %}selected{% endif %}>Budget (Low to High)</option>
                 </select>
             </div>
-    
             <!-- Filter value -->
             <div class="col-md-2">
                 <input type="text" name="value" id="value" class="form-control form-control-sm" value="{{ value }}" placeholder="Enter filter value">
             </div>
-    
             <!-- Buttons -->
             <div class="col-md-3 d-flex align-items-start">
                 <button type="submit" class="btn btn-primary btn-sm mr-2">Apply</button>

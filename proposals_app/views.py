@@ -1,6 +1,7 @@
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
@@ -14,20 +15,18 @@ from evaluation_app.models import Evaluation
 from accounts_app.models import CustomUser
 from django.core.paginator import Paginator
 
+
 # Admin: List all proposals for a specific grant call
 @staff_member_required
 def admin_proposal_list(request):
     grant_call_id = request.GET.get('grant_call')
     status = request.GET.get('status')
 
-    # Fetch all proposals by default
     proposals = Proposal.objects.all().order_by('-submitted_at')
 
-    # Filter by grant call if provided
     if grant_call_id:
         proposals = proposals.filter(grant_call_id=grant_call_id)
 
-    # Filter by status if provided
     if status:
         proposals = proposals.filter(status=status)
 
@@ -45,23 +44,19 @@ def admin_proposal_list(request):
             proposal = get_object_or_404(Proposal, id=proposal_id)
             evaluator = get_object_or_404(CustomUser, id=evaluator_id)
 
-            # Assign or reassign the evaluator to the proposal
             proposal.evaluator = evaluator
-            proposal.status = "under_review"  # Update status to "under_review"
+            proposal.status = "under_review"
             proposal.save()
 
-            # Create or update the Evaluation object
             evaluation, created = Evaluation.objects.get_or_create(
                 proposal=proposal,
                 defaults={'evaluator': evaluator, 'status': 'pending'}
             )
             if not created:
-                # If the evaluation already exists, update the evaluator and status
                 evaluation.evaluator = evaluator
                 evaluation.status = 'pending'
                 evaluation.save()
 
-            # Log the action
             LogEntry.objects.create(
                 user=request.user,
                 action="Evaluator Assigned/Reassigned",
@@ -71,7 +66,6 @@ def admin_proposal_list(request):
                 source="Admin",
             )
 
-            # Notify the evaluator
             Notification.objects.create(
                 user=evaluator,
                 notification_type="in_app",
@@ -153,8 +147,22 @@ def proposal_update(request, pk):
                     response.file = response_file
                 response.save()
 
-            messages.success(request, "Your proposal has been updated successfully!")
-            return redirect("proposals_app:proposal_list")
+            if 'submit' in request.POST:
+                proposal.status = 'submitted'
+                proposal.submitted_at = timezone.now()
+                proposal.save()
+
+                messages.success(request, "Your application has been submitted successfully!")
+                Notification.objects.create(
+                    user=request.user,
+                    notification_type="in_app",
+                    message=f"Your application for the grant call '{grant_call.title}' has been submitted.",
+                    is_read=False,
+                )
+                return redirect("proposals_app:proposal_list")
+            else:
+                messages.success(request, "Your proposal has been updated successfully!")
+                return redirect("proposals_app:proposal_list")
         else:
             messages.error(request, "There was an error updating your proposal. Please check the form.")
     else:

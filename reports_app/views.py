@@ -8,6 +8,7 @@ from evaluation_app.models import Evaluation
 from django.db import models
 from django.core.paginator import Paginator
 
+
 # Dashboard view for Admin and Staff
 @staff_member_required
 def dashboard(request):
@@ -33,6 +34,7 @@ def dashboard(request):
     }
     return render(request, 'reports_app/dashboard.html', context)
 
+
 # View to display a list of reports
 @staff_member_required
 def report_list(request):
@@ -42,11 +44,13 @@ def report_list(request):
     page_obj = paginator.get_page(page_number)
     return render(request, 'reports_app/report_list.html', {'page_obj': page_obj})
 
+
 # View to display a detailed report
 @staff_member_required
 def report_detail(request, pk):
     report = Report.objects.get(pk=pk)
     return render(request, 'reports_app/report_detail.html', {'report': report})
+
 
 # View to generate a new report
 @staff_member_required

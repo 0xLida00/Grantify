@@ -28,7 +28,7 @@
         <div class="card text-white bg-warning mb-3">
             <div class="card-body d-flex flex-column justify-content-center align-items-center">
                 <h5 class="card-title">Average Score</h5>
-                <p class="card-text display-4">{{ average_score|default:"N/A" }}</p>
+                <p class="card-text display-4">{{ average_score|floatformat:2|default:"N/A" }}</p>
             </div>
         </div>
     </div>
@@ -106,6 +106,6 @@
     [{{ accepted_proposals }}, {{ rejected_proposals }}, {{ under_review_proposals }}, {{ submitted_proposals }}]
 </script>
 <script id="evaluationScoresData" type="application/json">
-    [{{ average_score|default:0 }}]
+    [{{ average_score|floatformat:2|default:"0.00" }}]
 </script>
 {% endblock %}

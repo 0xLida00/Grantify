@@ -71,7 +71,7 @@ class AuditAppViewsTestCase(TestCase):
         # Test first page
         response = self.client.get(reverse('log_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['page_obj']), 25)  # First page has 25 logs
+        self.assertEqual(len(response.context['page_obj']), 25)
 
         # Test second page
         response = self.client.get(reverse('log_list') + '?page=2')

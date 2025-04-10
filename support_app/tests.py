@@ -1,7 +1,10 @@
+import json
 from django.test import TestCase
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
+from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from .models import SupportTicket, Feedback, FAQ, ToDo
 from .forms import SupportTicketForm, FeedbackForm
 
@@ -33,14 +36,12 @@ class FeedbackModelTest(TestCase):
         self.feedback = Feedback.objects.create(
             user=self.user,
             message="Great service!",
-            rating=5,
         )
 
     # Feedback_creation: Tests the creation of a Feedback.
-    def test_2_feedback_creation(self):
+    def test_feedback_creation(self):
         self.assertEqual(self.feedback.message, "Great service!")
-        self.assertEqual(self.feedback.rating, 5)
-        self.assertEqual(str(self.feedback), f"Feedback from {self.user.username} (Rating: {self.feedback.rating})")
+        self.assertEqual(str(self.feedback), f"Feedback from {self.user.username}")
 
 
 class FAQModelTest(TestCase):
@@ -71,7 +72,7 @@ class SupportTicketFormTest(TestCase):
     # Invalid_form: Tests an invalid SupportTicketForm.
     def test_5_invalid_form(self):
         form_data = {
-            "subject": "",  # Missing subject
+            "subject": "",
             "description": "Test Description",
             "priority": "medium",
         }
@@ -195,7 +196,7 @@ class AdminFAQViewTest(TestCase):
     def test_regular_user_cannot_view_faq_list(self):
         self.client.login(username="regularuser", password="password123")
         response = self.client.get("/admin-panel/faqs/")
-        self.assertEqual(response.status_code, 302)  # Check for redirect
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, "/admin/login/?next=/admin-panel/faqs/")
 
     # Test: Admin can create FAQ
@@ -245,7 +246,11 @@ class FAQVotingTest(TestCase):
     # Test: User can vote thumbs up
     def test_user_can_vote_thumbs_up(self):
         self.client.login(username="testuser", password="password123")
-        response = self.client.post(f"/faqs/{self.faq.id}/vote/", {"vote_type": "up"})
+        response = self.client.post(
+            reverse('vote_faq', args=[self.faq.id]),
+            data=json.dumps({"vote_type": "up"}),
+            content_type="application/json"
+        )
         self.assertEqual(response.status_code, 200)
         self.faq.refresh_from_db()
         self.assertEqual(self.faq.thumbs_up, 1)
@@ -254,7 +259,11 @@ class FAQVotingTest(TestCase):
     # Test: User can vote thumbs down
     def test_user_can_vote_thumbs_down(self):
         self.client.login(username="testuser", password="password123")
-        response = self.client.post(f"/faqs/{self.faq.id}/vote/", {"vote_type": "down"})
+        response = self.client.post(
+            reverse('vote_faq', args=[self.faq.id]),
+            data=json.dumps({"vote_type": "down"}),
+            content_type="application/json"
+        )
         self.assertEqual(response.status_code, 200)
         self.faq.refresh_from_db()
         self.assertEqual(self.faq.thumbs_up, 0)
@@ -263,8 +272,18 @@ class FAQVotingTest(TestCase):
     # Test: User can switch votes
     def test_user_can_switch_votes(self):
         self.client.login(username="testuser", password="password123")
-        self.client.post(f"/faqs/{self.faq.id}/vote/", {"vote_type": "up"})
-        self.client.post(f"/faqs/{self.faq.id}/vote/", {"vote_type": "down"})
+        # Vote thumbs up
+        self.client.post(
+            reverse('vote_faq', args=[self.faq.id]),
+            data=json.dumps({"vote_type": "up"}),
+            content_type="application/json"
+        )
+        # Switch to thumbs down
+        self.client.post(
+            reverse('vote_faq', args=[self.faq.id]),
+            data=json.dumps({"vote_type": "down"}),
+            content_type="application/json"
+        )
         self.faq.refresh_from_db()
         self.assertEqual(self.faq.thumbs_up, 0)
         self.assertEqual(self.faq.thumbs_down, 1)
@@ -299,20 +318,16 @@ class ToDoModelTest(TestCase):
 class ToDoAPITest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="password123")
+        self.client = APIClient()
         self.client.login(username="testuser", password="password123")
-        self.todo = ToDo.objects.create(
-            user=self.user,
-            title="Test Task",
-            description="This is a test task.",
-            completed=False,
-        )
+        self.todo = ToDo.objects.create(user=self.user, title="Task 1")
 
     # Test: Fetch to-do list
     def test_fetch_todo_list(self):
-        response = self.client.get("/api/todos/")
+        response = self.client.get('/api/todos/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["title"], "Test Task")
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['title'], "Task 1")
 
     # Test: Create a new to-do item
     def test_create_todo_item(self):

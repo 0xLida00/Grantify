@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Helper function to get CSRF token
     function getCSRFToken() {
         const csrfToken = document.getElementById('csrfToken');
         return csrfToken ? csrfToken.value : '';

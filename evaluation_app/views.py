@@ -13,6 +13,7 @@ from proposals_app.models import Proposal
 from accounts_app.models import CustomUser
 from django.core.paginator import Paginator
 
+
 # Admin: Assign proposals to evaluators
 @staff_member_required
 def assign_evaluators(request):
@@ -50,6 +51,7 @@ def assign_evaluators(request):
         return redirect('assign_evaluators')
     return render(request, 'evaluation_app/assign_evaluators.html', {'proposals': proposals, 'evaluators': evaluators})
 
+
 # Admin: Monitor evaluation progress
 @staff_member_required
 def monitor_evaluations(request):
@@ -85,11 +87,12 @@ def monitor_evaluations(request):
         'evaluators': evaluators,
     })
 
+
 # Evaluator: View assigned proposals
 @login_required
 def evaluator_dashboard(request):
     status_filter = request.GET.get('status', '')
-    evaluations = Evaluation.objects.filter(evaluator=request.user)
+    evaluations = Evaluation.objects.filter(evaluator=request.user).order_by('-evaluated_at')
 
     if status_filter:
         evaluations = evaluations.filter(status=status_filter)
@@ -111,6 +114,7 @@ def evaluator_dashboard(request):
         'evaluations': page_obj,
         'status_filter': status_filter,
     })
+
 
 # Evaluator: Submit evaluation
 @login_required
@@ -136,14 +140,6 @@ def submit_evaluation(request, pk):
         form = EvaluationForm(request.POST, instance=evaluation)
         if form.is_valid():
             evaluation = form.save(commit=False)
-
-            if evaluation.score < 0 or evaluation.score > 10:
-                messages.error(request, "Score must be between 0 and 10.")
-                return render(request, 'evaluation_app/submit_evaluation.html', {
-                    'form': form,
-                    'evaluation': evaluation,
-                    'questions_with_responses': questions_with_responses,
-                })
 
             evaluation.status = 'completed'
             evaluation.evaluated_at = now()
@@ -178,6 +174,7 @@ def submit_evaluation(request, pk):
         'evaluation': evaluation,
         'questions_with_responses': questions_with_responses,
     })
+
 
 # Feedback: View evaluation details
 @staff_member_required

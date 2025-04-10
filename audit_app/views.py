@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import LogEntry
 
+
 # View to display a list of logs
 @staff_member_required
 def log_list(request):
@@ -21,6 +22,7 @@ def log_list(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'audit_app/log_list.html', {'page_obj': page_obj})
+
 
 # View to display details of a specific log entry
 @staff_member_required

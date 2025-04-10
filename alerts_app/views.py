@@ -5,6 +5,7 @@ from django.contrib import messages
 from .models import Notification, NotificationPreference
 from .forms import NotificationPreferenceForm
 
+
 # Display notifications
 @login_required
 def notification_list(request):
@@ -14,6 +15,7 @@ def notification_list(request):
     page_obj = paginator.get_page(page_number)
     return render(request, 'alerts_app/notification_list.html', {'page_obj': page_obj})
 
+
 # Mark a notification as read
 @login_required
 def mark_notification_as_read(request, pk):
@@ -22,6 +24,7 @@ def mark_notification_as_read(request, pk):
 
     messages.success(request, "Notification marked as read.")
     return redirect('notification_list')
+
 
 # Manage notification preferences
 @login_required

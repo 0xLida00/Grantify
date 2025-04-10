@@ -42,7 +42,7 @@ header {
   color: #527ad2 !important;
 }
 
-/* Base styling for body with flex column layout */
+/* Base styling */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -52,7 +52,7 @@ body {
   min-height: 100vh;
 }
 
-/* Main wrapper: allow it to grow and push footer down */
+/* Main wrapper Styles */
 #wrapper {
   display: flex;
   width: 100%;
@@ -239,4 +239,56 @@ canvas {
   display: block;
   max-width: 100%;
   max-height: 100%;
+}
+
+/* Scoped CSS for the Apply Page */
+.apply-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.apply-table .choices-wrapper ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.apply-table .choices-wrapper li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.apply-table .custom-checkbox {
+  margin-left: 15px;
+  margin-right: 10px;
+}
+
+.apply-table .custom-label {
+  margin-left: 5px;
+  white-space: nowrap;
+}
+
+/* Custom styling for invalid fields */
+.is-invalid {
+  border-color: red;
+}
+
+.invalid-feedback {
+  color: red;
+  font-size: 0.9rem;
+}
+
+.alert.alert-danger {
+  color: red;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+.invalid-feedback p {
+  margin: 0;
+  padding: 0;
 }

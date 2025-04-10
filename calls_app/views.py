@@ -16,10 +16,6 @@ from .forms import GrantCallForm, GrantQuestionForm, GrantChoiceForm, GrantQuest
 from audit_app.models import LogEntry
 from proposals_app.models import Proposal
 
-# Logger for debugging (optional)
-import logging
-logger = logging.getLogger(__name__)
-
 
 # Grant Call List View with Pagination and Filtering
 class GrantCallListView(ListView):
@@ -145,6 +141,12 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
         else:
             messages.error(self.request, "There was an error creating the grant call. Please check the form.")
             return self.form_invalid(form)
+        
+    def form_invalid(self, form):
+        context = self.get_context_data()
+        question_formset = context["question_formset"]
+        return super().form_invalid(form)
+
 
 # Grant Call Detail View
 class GrantCallDetailView(DetailView):
@@ -160,6 +162,7 @@ class GrantCallDetailView(DetailView):
 
         return context
 
+
 # Grant Call Application View
 @login_required
 def apply_grant_call(request, pk):
@@ -172,7 +175,6 @@ def apply_grant_call(request, pk):
         messages.error(request, "This grant call is not open for applications.")
         return redirect("grant_call_list")
 
-    # Retrieve or create a Proposal object for the applicant and grant call
     proposal, created = Proposal.objects.get_or_create(
         grant_call=grant_call,
         applicant=request.user,
@@ -183,20 +185,17 @@ def apply_grant_call(request, pk):
         }
     )
 
-    # Retrieve all questions for the grant call
     questions = grant_call.questions.all()
 
-    # Populate initial data with saved responses
     initial_data = {}
     for question in questions:
         try:
             response = GrantResponse.objects.get(question=question, user=request.user, grant_call=grant_call)
-            initial_data[f'question_{question.id}_response'] = response.response  # Text response
-            initial_data[f'question_{question.id}_file'] = response.file  # File response (if applicable)
+            initial_data[f'question_{question.id}_response'] = response.response
+            initial_data[f'question_{question.id}_file'] = response.file
         except GrantResponse.DoesNotExist:
             pass
 
-    # Handle form submission
     if request.method == 'POST':
         form = ApplicationForm(request.POST, request.FILES, questions=questions, initial=initial_data)
         if form.is_valid():
@@ -214,7 +213,6 @@ def apply_grant_call(request, pk):
                 response.is_final_submission = 'submit' in request.POST
                 response.save()
 
-            # Update the Proposal object
             if 'submit' in request.POST:
                 proposal.status = 'submitted'
                 messages.success(request, f"You have successfully submitted your application for the grant call: {grant_call.title}")
@@ -223,17 +221,6 @@ def apply_grant_call(request, pk):
             proposal.description = form.cleaned_data.get('description', proposal.description)
             proposal.save()
 
-            # Log the action
-            LogEntry.objects.create(
-                user=request.user,
-                action="Grant Call Applied",
-                object_repr=str(grant_call),
-                change_message=f"User applied for grant call '{grant_call.title}'.",
-                log_level="INFO",
-                source="User",
-            )
-
-            # Send a notification if the application is submitted
             if 'submit' in request.POST:
                 Notification.objects.create(
                     user=request.user,
@@ -245,7 +232,6 @@ def apply_grant_call(request, pk):
             else:
                 return redirect("apply_grant_call", pk=grant_call.pk)
     else:
-        # Pre-fill the form with initial data
         form = ApplicationForm(questions=questions, initial=initial_data)
 
     return render(request, 'calls_app/apply_grant_call.html', {
@@ -253,6 +239,7 @@ def apply_grant_call(request, pk):
         'form': form,
         'proposal': proposal,
     })
+
 
 # Toggle Favorite View
 @login_required
@@ -347,8 +334,12 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             messages.success(self.request, "Grant call updated successfully!")
             return redirect(self.success_url)
         else:
-            messages.error(self.request, "There was an error updating the grant call. Please check the form.")
             return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        context = self.get_context_data()
+        question_formset = context["question_formset"]
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 # Grant Call Delete View
@@ -393,7 +384,6 @@ def add_question(request, grant_call_id):
             question = form.save(commit=False)
             question.grant_call = grant_call
             question.save()
-            messages.success(request, "Question added successfully!")
             return redirect("grant_call_detail", pk=grant_call.id)
     else:
         form = GrantQuestionForm()

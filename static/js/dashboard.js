@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ['Accepted', 'Rejected', 'Under Review', 'Submitted'],
             datasets: [{
                 label: 'Proposal Status',
-                data: JSON.parse(document.getElementById('proposalStatusData').textContent), // Dynamically load data
+                data: JSON.parse(document.getElementById('proposalStatusData').textContent),
                 backgroundColor: ['#28a745', '#dc3545', '#ffc107', '#007bff'],
             }]
         },
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ['Average Score'],
             datasets: [{
                 label: 'Scores',
-                data: JSON.parse(document.getElementById('evaluationScoresData').textContent), // Dynamically load data
+                data: JSON.parse(document.getElementById('evaluationScoresData').textContent),
                 backgroundColor: ['#17a2b8'],
             }]
         },

@@ -3,7 +3,13 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Frequently Asked Questions</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Frequently Asked Questions</h1>
+        <form method="get" action="{% url 'faq_page' %}" class="form-inline">
+            <input type="text" name="q" class="form-control mr-2" placeholder="Search FAQs" value="{{ request.GET.q }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <ul class="list-group">
         {% for faq in page_obj %}

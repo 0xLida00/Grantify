@@ -8,8 +8,8 @@ from audit_app.models import LogEntry
 from .forms import CustomSignupForm, ProfileUpdateForm, UserUpdateForm, CustomPasswordChangeForm
 from .models import CustomUser
 
+
 def signup(request):
-    '''View for user registration'''
     if request.method == 'POST':
         form = CustomSignupForm(request.POST, request.FILES)
         if form.is_valid():
@@ -38,9 +38,11 @@ def signup(request):
         form = CustomSignupForm()
     return render(request, 'accounts_app/signup.html', {'form': form})
 
+
 def user_login(request):
-    '''View for user login'''
     next_url = request.GET.get('next', '')
+    error_message = None
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -65,11 +67,12 @@ def user_login(request):
                 return redirect(next_url)
             return redirect('home')
         else:
-            messages.error(request, "Invalid username or password.")
-    return render(request, 'accounts_app/login.html', {'next': next_url})
+            error_message = "Invalid username or password!"
+
+    return render(request, 'accounts_app/login.html', {'next': next_url, 'error_message': error_message})
+
 
 def user_logout(request):
-    '''View for user logout'''
     if request.user.is_authenticated:
         LogEntry.objects.create(
             user=request.user,
@@ -85,9 +88,9 @@ def user_logout(request):
     messages.success(request, "You have been logged out.")
     return redirect('home')
 
+
 @login_required
 def profile(request, username):
-    '''View for user profile'''
     user_profile = get_object_or_404(CustomUser, username=username)
 
     if request.user != user_profile:
@@ -130,9 +133,9 @@ def profile(request, username):
         'user_profile': user_profile
     })
 
+
 @login_required
 def password_change(request):
-    '''View for changing user password'''
     if request.method == 'POST':
         form = CustomPasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
@@ -162,6 +165,7 @@ def password_change(request):
     else:
         form = CustomPasswordChangeForm(user=request.user)
     return render(request, 'accounts_app/password_change.html', {'form': form})
+
 
 def password_change_done(request):
     return render(request, 'accounts_app/password_change_done.html')

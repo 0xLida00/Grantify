@@ -6,7 +6,6 @@
 
 {% block content %}
 <div class="container mt-5">
-    <!-- Profile Header -->
     <div class="text-center mb-4">
         {% if user.profile_picture and user.profile_picture.url %}
             <img class="rounded-circle account-img mb-3" 
@@ -41,13 +40,11 @@
                 </fieldset>
             </div>
         </div>
-        <!-- Centered Update Profile Button -->
         <div class="text-center">
             <button class="btn btn-primary mt-3" type="submit">Update Profile</button>
         </div>
     </form>
 
-    <!-- Centered Change Password Link -->
     <div class="text-center mt-4">
         <a href="{% url 'password_change' %}" class="btn btn-warning">Change Password</a>
     </div>

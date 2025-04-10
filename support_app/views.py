@@ -12,6 +12,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import FAQ, SupportTicket, Feedback, ToDo
+from django.db.models import Q
 from .serializers import FAQSerializer, SupportTicketSerializer, FeedbackSerializer, ToDoSerializer
 from .forms import SupportTicketForm, FeedbackForm, FAQForm
 from django.views.generic import ListView
@@ -46,12 +47,12 @@ class SupportTicketCreateView(APIView):
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(
-                {"message": "Support ticket created successfully!".strip()},
+                {"message": "Support ticket created successfully!"},
                 status=status.HTTP_201_CREATED
             )
         return Response(
             {
-                "message": "Failed to create support ticket. Please check the form.".strip(),
+                "message": "Failed to create support ticket. Please check the form.",
                 "errors": serializer.errors,
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -67,12 +68,12 @@ class FeedbackCreateView(APIView):
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(
-                {"message": "Feedback submitted successfully!".strip()},
+                {"message": "Feedback submitted successfully!"},
                 status=status.HTTP_201_CREATED
             )
         return Response(
             {
-                "message": "Failed to submit feedback. Please check the form.".strip(),
+                "message": "Failed to submit feedback. Please check the form.",
                 "errors": serializer.errors
             },
             status=status.HTTP_400_BAD_REQUEST
@@ -180,11 +181,22 @@ def user_ticket_detail(request, ticket_id):
 
 # FAQ Page View
 def faq_page(request):
+    query = request.GET.get('q', '')
     faqs = FAQ.objects.filter(status='published').order_by('-created_at')
+
+    if query:
+        faqs = faqs.filter(
+            Q(question__icontains=query) | Q(answer__icontains=query)
+        )
+
     paginator = Paginator(faqs, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'support_app/faq_page.html', {'page_obj': page_obj})
+
+    return render(request, 'support_app/faq_page.html', {
+        'page_obj': page_obj,
+        'query': query,
+    })
 
 
 # Admin FAQ Views
@@ -240,28 +252,32 @@ def vote_faq(request, faq_id):
     user = request.user
 
     if request.method == 'POST':
-        vote_type = request.POST.get('vote_type')
+        try:
+            data = json.loads(request.body)
+            vote_type = data.get('vote_type')
 
-        if vote_type == 'up':
-            if user in faq.voted_down.all():
-                faq.voted_down.remove(user)
-                faq.thumbs_down -= 1
+            if vote_type == 'up':
+                if user in faq.voted_down.all():
+                    faq.voted_down.remove(user)
+                    faq.thumbs_down -= 1
 
-            if user not in faq.voted_up.all():
-                faq.voted_up.add(user)
-                faq.thumbs_up += 1
+                if user not in faq.voted_up.all():
+                    faq.voted_up.add(user)
+                    faq.thumbs_up += 1
 
-        elif vote_type == 'down':
-            if user in faq.voted_up.all():
-                faq.voted_up.remove(user)
-                faq.thumbs_up -= 1
+            elif vote_type == 'down':
+                if user in faq.voted_up.all():
+                    faq.voted_up.remove(user)
+                    faq.thumbs_up -= 1
 
-            if user not in faq.voted_down.all():
-                faq.voted_down.add(user)
-                faq.thumbs_down += 1
+                if user not in faq.voted_down.all():
+                    faq.voted_down.add(user)
+                    faq.thumbs_down += 1
 
-        faq.save()
-        return JsonResponse({'thumbs_up': faq.thumbs_up, 'thumbs_down': faq.thumbs_down})
+            faq.save()
+            return JsonResponse({'thumbs_up': faq.thumbs_up, 'thumbs_down': faq.thumbs_down})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
@@ -273,7 +289,7 @@ def todo_page(request):
 
 
 class ToDoPagination(PageNumberPagination):
-    page_size = 15  # Number of items per page
+    page_size = 15
     page_size_query_param = 'page_size'
     max_page_size = 20
 

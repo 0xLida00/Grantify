@@ -13,6 +13,3 @@ urlpatterns = [
     path('admin/', views.admin_proposal_list, name='admin_proposal_list'),
     path('admin/<int:pk>/', views.admin_proposal_detail, name='admin_proposal_detail'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

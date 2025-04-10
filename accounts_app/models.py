@@ -34,13 +34,11 @@ class CustomUser(AbstractUser):
         return self.username
 
     def get_profile_picture_url(self):
-        """Return profile picture URL or default image."""
         if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
             return self.profile_picture.url
         return f"{settings.MEDIA_URL}profile_pics/default.png"
 
     def save(self, *args, **kwargs):
-        """Resize profile picture to 300x300 pixels if necessary."""
         super().save(*args, **kwargs)
         if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
             try:

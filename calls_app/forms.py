@@ -69,7 +69,7 @@ class ApplicationForm(forms.Form):
                 self.fields[f'question_{question.id}_response'] = forms.MultipleChoiceField(
                     label=question.question_text,
                     choices=[(choice, choice) for choice in question.get_choices()],
-                    widget=CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+                    widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
                     required=False,
                 )
             elif question.question_type == 'file_upload':

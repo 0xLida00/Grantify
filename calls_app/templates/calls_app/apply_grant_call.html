@@ -36,32 +36,51 @@
             <div class="card-body">
                 <h5 class="card-title">Application Form</h5>
                 <hr>
-                {% for field in form %}
-                <div class="mb-4">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {% if field.widget.input_type == "checkbox" %}
-                    <div class="list-group">
-                        {% for subwidget in field %}
-                        <div class="list-group-item">
-                            <div class="form-check">
-                                {{ subwidget.tag }}
-                                <label class="form-check-label" for="{{ subwidget.id }}">{{ subwidget.choice_label }}</label>
-                            </div>
-                        </div>
+                <table class="table table-bordered apply-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">Question</th>
+                            <th style="width: 65%;">Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for field in form %}
+                        <tr>
+                            <!-- Question -->
+                            <td>
+                                <label for="{{ field.id_for_label }}" class="form-label"><strong>{{ field.label }}</strong></label>
+                            </td>
+                            <!-- Answer -->
+                            <td>
+                                {% if field.widget.input_type == "checkbox" %}
+                                <div class="choices-wrapper">
+                                    <ul class="list-unstyled">
+                                        {% for choice_value, choice_label in field.field.choices %}
+                                        <li class="mb-2 d-flex align-items-center">
+                                            <input type="checkbox" name="{{ field.html_name }}" value="{{ choice_value }}" id="{{ field.id_for_label }}_{{ forloop.counter }}" class="custom-checkbox">
+                                            <label class="custom-label ms-2" for="{{ field.id_for_label }}_{{ forloop.counter }}">{{ choice_label }}</label>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% elif field.widget.input_type == "file" %}
+                                <!-- File Upload -->
+                                <div class="form-control">
+                                    {{ field }}
+                                </div>
+                                {% else %}
+                                <!-- Other Input Types -->
+                                {{ field }}
+                                {% endif %}
+
+                                {% if field.errors %}
+                                <div class="text-danger mt-1">{{ field.errors }}</div>
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                    {% elif field.widget.input_type == "file" %}
-                    <div class="form-control">
-                        {{ field }}
-                    </div>
-                    {% else %}
-                    {{ field }}
-                    {% endif %}
-                    {% if field.errors %}
-                    <div class="text-danger mt-1">{{ field.errors }}</div>
-                    {% endif %}
-                </div>
-                {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
