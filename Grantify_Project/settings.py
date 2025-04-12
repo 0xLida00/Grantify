@@ -43,6 +43,8 @@ LOGOUT_REDIRECT_URL = '/'
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
+    'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,7 +52,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'cloudinary_storage',
     'cloudinary',
-    'django.contrib.staticfiles',
     'accounts_app',
     'calls_app',
     'proposals_app',
@@ -105,8 +106,8 @@ ASGI_APPLICATION = "grantify_project.asgi.application"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
