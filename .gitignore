@@ -82,6 +82,7 @@ Pipfile.lock
 node_modules/
 npm-debug.log
 yarn-error.log
+debug.log
 
 # Compiled CSS (if using SASS/SCSS)
 *.sass-cache/

@@ -2,302 +2,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Grantify{% endblock %}</title>
-  <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
-  
-  <!-- Bootstrap and Font Awesome -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  
-  <!-- Custom styles -->
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-  {% block extra_css %}{% endblock %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Grantify{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+    
+
+    <!-- Bootstrap and Font Awesome -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css">
+
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="header bg-light text-white">
-        <div class="container">
-            <div class="d-flex align-items-center justify-content-between">
-                {% if user.is_authenticated %}
-                    <div class="d-flex align-items-center ml-auto">
-                        <!-- Welcome Badge -->
-                        <span class="badge badge-secondary ml-3">Welcome, {{ user.username }}</span>
-                        <!-- Profile Picture -->
-                        <div class="ml-3">
+    <div class="container">
+        <br>
+        <div class="d-flex align-items-center justify-content-between">
+            {% if user.is_authenticated %}
+                <div class="d-flex align-items-center ml-auto">
+                    <!-- Welcome Badge -->
+                    <span class="badge badge-secondary ml-3">Welcome, {{ user.username }}</span>
+                    <!-- Profile Picture -->
+                    <div class="ml-3">
+                        <a href="{% url 'profile' user.username %}">
                             {% if user.profile_picture and user.profile_picture.url %}
-                                <a href="{{ user.get_profile_picture_url }}" target="_blank">
-                                    <img src="{{ user.get_profile_picture_url }}" alt="Profile Picture" class="rounded-circle profile-picture" width="40" height="40">
-                                </a>
+                                <img src="{{ user.get_profile_picture_url }}" alt="Profile Picture" class="rounded-circle profile-picture" width="40" height="40">
                             {% else %}
-                                <a href="{% static 'img/default.png' %}" target="_blank">
-                                    <img src="{% static 'img/default.png' %}" alt="Default Profile Picture" class="rounded-circle profile-picture" width="40" height="40">
-                                </a>
+                                <img src="{% static 'img/default.png' %}" alt="Default Profile Picture" class="rounded-circle profile-picture" width="40" height="40">
                             {% endif %}
-                        </div>
-                        <!-- Notifications Dropdown -->
-                        {% if user.is_authenticated %}
-                        <li class="nav-item dropdown position-relative d-flex align-items-center ml-4">
-                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown"
-                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell bell-icon"></i>
-                                {% if unread_notifications_count > 0 %}
-                                    <span class="badge badge-danger notification-badge">{{ unread_notifications_count }}</span>
-                                {% endif %}
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
-                                {% for notification in user.notifications.all|slice:":5" %}
-                                    <div class="dropdown-item {% if not notification.is_read %}bg-light{% endif %}">
-                                        <strong>{{ notification.notification_type|title }}</strong>: {{ notification.message }}
-                                        {% if notification.target_url %}
-                                            <a href="{{ notification.target_url }}">View</a>
-                                        {% endif %}
-                                        <small class="text-muted d-block">{{ notification.created_at|date:"M d, Y H:i" }}</small>
-                                    </div>
-                                {% empty %}
-                                    <div class="dropdown-item text-center">No new notifications.</div>
-                                {% endfor %}
-                                <div class="dropdown-item text-center">
-                                    <a href="{% url 'notification_list' %}">View All Notifications</a>
+                        </a>
+                    </div>
+                    <!-- Notifications Dropdown -->
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown position-relative d-flex align-items-center ml-4">
+                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown"
+                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-bell bell-icon"></i>
+                            {% if unread_notifications_count > 0 %}
+                                <span class="badge badge-danger notification-badge">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
+                            {% for notification in user.notifications.all|slice:":5" %}
+                                <div class="dropdown-item {% if not notification.is_read %}bg-light{% endif %}">
+                                    <strong>{{ notification.notification_type|title }}</strong>: {{ notification.message }}
+                                    {% if notification.target_url %}
+                                        <a href="{{ notification.target_url }}">View</a>
+                                    {% endif %}
+                                    <small class="text-muted d-block">{{ notification.created_at|date:"M d, Y H:i" }}</small>
                                 </div>
+                            {% empty %}
+                                <div class="dropdown-item text-center">No new notifications.</div>
+                            {% endfor %}
+                            <div class="dropdown-item text-center">
+                                <a href="{% url 'notification_list' %}">View All Notifications</a>
                             </div>
-                        </li>
-                        {% endif %}
-                    </div>
-                {% endif %}
-            </div>
-
-            <!-- Top Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-                <button class="btn btn-primary" id="menu-toggle">
-                    <i class="fas a-chevron-left"></i>
-                </button>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ml-auto">
-                        {% if user.is_authenticated %}
-                            {% if user.role == 'applicant' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'favorite_grant_calls' %}">Favorites</a>
-                            </li>
-                            {% endif %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'todo_list' %}">To-Do List</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'profile' user.username %}">Profile</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <div class="sidebar-heading bg-primary text-white">
-                <h1 class="display-4">
-                    <a href="{% url 'home' %}" class="text-white text-decoration-none">Grantify</a>
-                </h1>
-            </div>
-            <div class="list-group list-group-flush">
-                <h4>
-                    <a href="{% url 'home' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-home"></i> Home
-                    </a>
-                </h4>
-                <h4>
-                    <a href="{% url 'grant_call_list' %}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-bullhorn"></i> Grant Calls
-                    </a>
-                </h4>
-
-                {% if user.is_authenticated %}
-                <h4>
-                    {% if user.is_staff %}
-                        <a href="{% url 'proposals_app:admin_proposal_list' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-file-alt"></i> Proposals
-                        </a>
-                    {% else %}
-                        <a href="{% url 'proposals_app:proposal_list' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-file-alt"></i> My Proposals
-                        </a>
+                        </div>
+                    </li>
                     {% endif %}
-                </h4>
-
-                <!-- Evaluator-Specific Links -->
-                {% if user.role == 'evaluator' %}
-                    <h4>
-                        <a href="{% url 'evaluator_dashboard' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-check"></i> My Evaluations
-                        </a>
-                    </h4>
-                {% endif %}
-
-                <!-- Tickets -->
-                {% if user.role == 'applicant' or user.role == 'evaluator' %}
-                    <h4>
-                        <a href="{% url 'user_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-ticket-alt"></i> Tickets
-                        </a>
-                    </h4>
-                {% endif %}
-
-                <!-- Staff-Specific Links -->
-                {% if user.is_staff %}
-                    <h4>
-                        <a href="{% url 'monitor_evaluations' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-check"></i> Evaluations
-                        </a>
-                    </h4>
-                    <h4>
-                        <a href="{% url 'admin_ticket_list' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-ticket-alt"></i> Tickets
-                        </a>
-                    </h4>
-                    <h4>
-                        <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-chart-bar"></i> Reports
-                        </a>
-                    </h4>
-                {% endif %}
-
-                <!-- Superuser-Specific Links -->
-                {% if user.is_superuser %}
-                    <h4>
-                        <a href="{% url 'log_list' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-user-shield"></i> Audit
-                        </a>
-                    </h4>
-                    <h4>
-                        <a href="{% url 'admin_faq_list' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-question-circle"></i> FAQ
-                        </a>
-                    </h4>
-                    <h4>
-                        <a href="{% url 'feedback_list' %}" class="list-group-item list-group-item-action bg-light">
-                            <i class="fas fa-comments"></i> Feedbacks
-                        </a>
-                    </h4>
-                {% endif %}
-                {% endif %}
-            </div>
-        </div>        
-            
-            <!-- Main Content -->
-            <main class="main-content container mt-4">
-                <!-- Flash Messages Section -->
-                <!-- Server-Rendered Flash Messages -->
-                {% if messages %}
-                    <div class="server-flash-messages-container">
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <!-- Dynamically Added Flash Messages -->
-                <div class="dynamic-flash-messages-container"></div>
-
-                {% block content %}{% endblock %}
-            </main>
+                </div>
+            {% endif %}
+        </div>
     </div>
+    <br>
 
-    <footer class="footer bg-primary text-white py-3 mt-auto">
+    <!-- Sidebar navigation menu -->
+    <nav class="sidebar">
+        <!-- Sidebar header containing logo and toggle button -->
+        <header>
+            <div class="image-text">
+                <a href="{% url 'home' %}" class="image">
+                    <img src="{% static 'img/logo.png' %}" alt="Logo">
+                </a>
+                <div class="text logo-text">
+                <span class="name">Grantify</span>
+                <span class="profession">By 0xLida00</span>
+                </div>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+
+        <!-- Sidebar menu items -->
+        <div class="menu-bar">
+            <div class="menu">
+                <!-- Search box within the sidebar -->
+                <li class="search-box">
+                    <i class='bx bx-search icon'></i>
+                    <input type="text" placeholder="Search...">
+                </li>
+
+                <!-- List of menu links -->
+                <ul class="menu-links">
+                    <li>
+                        <a href="{% url 'home' %}">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'grant_call_list' %}">
+                            <i class='bx bxs-megaphone icon'></i>
+                            <span class="text nav-text">Grant Calls</span>
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'favorite_grant_calls' %}">
+                                <i class='bx bx-heart icon'></i>
+                                <span class="text nav-text">Favorite Calls</span>
+                            </a>
+                        </li>
+                        {% if user.is_staff %}
+                            <li>            
+                                <a href="{% url 'proposals_app:admin_proposal_list' %}">
+                                    <i class='bx bx-file icon'></i>
+                                    <span class="text nav-text">Proposals</span>
+                                </a>
+                            </li>                                
+                        {% else %}
+                            <li>
+                                <a href="{% url 'proposals_app:proposal_list' %}">
+                                    <i class='bx bx-file icon'></i>
+                                    <span class="text nav-text">My Proposals</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+
+                    {% if user.role == 'evaluator' %}
+                        <li>
+                            <a href="{% url 'evaluator_dashboard' %}">
+                                <i class='bx bx-check-double icon'></i>
+                                <span class="text nav-text">My Evaluations</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.role == 'applicant' or user.role == 'evaluator' %}
+                        <li>
+                            <a href="{% url 'user_ticket_list' %}">
+                                <i class='bx bx-support icon'></i>
+                                <span class="text nav-text">My Tickets</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'todo_list' %}">
+                                <i class='bx bx-task icon'></i>
+                                <span class="text nav-text">To-Do List</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.is_staff %}
+                        <li>
+                            <a href="{% url 'monitor_evaluations' %}">
+                                <i class='bx bx-check-double icon'></i>
+                                <span class="text nav-text">Evaluations</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'admin_ticket_list' %}">
+                                <i class='bx bx-support icon'></i>
+                                <span class="text nav-text">Tickets</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'dashboard' %}">
+                                <i class='bx bx-bar-chart-alt-2 icon'></i>
+                                <span class="text nav-text">Reports</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.is_superuser %}
+                        <li>
+                            <a href="{% url 'log_list' %}">
+                                <i class='bx bx-detail icon'></i>
+                                <span class="text nav-text">Audit</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'admin_faq_list' %}">
+                                <i class='bx bx-help-circle icon'></i>
+                                <span class="text nav-text">FAQ</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'feedback_list' %}">
+                                <i class='bx bx-message-alt-dots icon'></i>
+                                <span class="text nav-text">Feedbacks</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Bottom content of the sidebar -->
+            <div class="bottom-content">
+                {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'profile' user.username %}">
+                            <i class='bx bx-user-circle icon'></i>
+                            <span class="text nav-text">Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'logout' %}">
+                            <i class='bx bx-log-out icon'></i>
+                            <span class="text nav-text">Logout</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'login' %}">
+                            <i class='bx bx-log-in icon'></i>
+                            <span class="text nav-text">Login</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'signup' %}">
+                            <i class='bx bx-user-plus icon'></i>
+                            <span class="text nav-text">Sign Up</span>
+                        </a>
+                    </li>
+                {% endif %}
+                <!-- Dark mode toggle switch -->
+                <li class="mode">
+                    <div class="sun-moon">
+                        <i class='bx bx-moon icon moon'></i>
+                        <i class='bx bx-sun icon sun'></i>
+                    </div>
+                    <span class="mode-text text">Dark mode</span>
+                    <div class="toggle-switch">
+                        <span class="switch"></span>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Main Content -->
+    <section class="home d-flex flex-column flex-grow-1">
+        <!-- Flash Messages Section -->
+        <!-- Server-Rendered Flash Messages -->
+        {% if messages %}
+            <div class="server-flash-messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Dynamically Added Flash Messages -->
+        <div class="dynamic-flash-messages-container"></div>
+
+        {% block content %}{% endblock %}
+
+    <footer class="footer bg-secondary text-white py-4 mt-auto">
         <div class="container text-center">
-            <p>&copy; 2024 Grantify. All rights reserved.</p>
-            <ul class="list-inline">
+            <p class="mb-2">&copy; 2024 Grantify. All rights reserved.</p>
+            <br>
+            <ul class="list-inline mb-0">
                 <li class="list-inline-item">
-                    <a class="text-white" href="https://linkedin.com/in/lidao-p-betema-01617295" target="_blank">
-                        <i class="fab fa-linkedin"></i>
+                    <a class="text-white" href="https://linkedin.com/in/lidao-p-betema-01617295" target="_blank" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin fa-lg"></i>
                     </a>
                 </li>
                 <li class="list-inline-item">
-                    <a class="text-white" href="https://github.com/0xLida00" target="_blank">
-                        <i class="fab fa-github"></i>
+                    <a class="text-white" href="https://github.com/0xLida00" target="_blank" aria-label="GitHub">
+                        <i class="fab fa-github fa-lg"></i>
                     </a>
                 </li>
                 <li class="list-inline-item">
-                    <a class="text-white" href="https://x.com/LidaoNFT" target="_blank">
-                        <i class="fab fa-twitter"></i>
+                    <a class="text-white" href="https://x.com/LidaoNFT" target="_blank" aria-label="Twitter">
+                        <i class="fab fa-twitter fa-lg"></i>
                     </a>
                 </li>
                 <li class="list-inline-item">
-                    <a class="text-white" href="mailto:rodrigue.betema@gmail.com" target="_blank">
-                        <i class="fas fa-envelope"></i>
+                    <a class="text-white" href="mailto:rodrigue.betema@gmail.com" target="_blank" aria-label="Email">
+                        <i class="fas fa-envelope fa-lg"></i>
                     </a>
                 </li>
             </ul>
         </div>
     </footer>
+    </section>
+    
 
     <!-- Floating Support Icon -->
     <div id="support-icon" class="support-icon">
-        <i class="fas fa-envelope"></i>
+    <i class="fas fa-envelope"></i>
     </div>
 
     <!-- Support Center Modal -->
     <div id="support-modal" class="support-modal">
-        <div class="support-modal-content">
-            <span class="close">&times;</span>
-            <h4>Support Center</h4>
+    <div class="support-modal-content">
+        <span class="close">&times;</span>
+        <h4>Support Center</h4>
 
-            <!-- FAQs Page -->
-            <div id="faq-section">
-                <h5><a href="{% url 'faq_page' %}" target="_blank">FAQs</a></h5>
-            </div>
-
-            <!-- Support Ticket Form -->
-            <div id="support-ticket-section">
-                <h5>Create a Support Ticket</h5>
-                <form id="support-ticket-form" method="post">
-                    {% csrf_token %}
-                    <input type="text" id="ticket-subject" name="subject" placeholder="Enter the subject of your issue" class="form-control" required>
-                    <textarea id="ticket-description" name="description" placeholder="Describe your issue in detail" class="form-control" rows="4" required></textarea>
-                    
-                    <!-- Priority Dropdown -->
-                    <label for="ticket-priority" class="form-label mt-2">Priority:</label>
-                    <select id="ticket-priority" name="priority" class="form-control" required>
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
-
-            <!-- Feedback Form -->
-            <div id="feedback-section">
-                <h5>Submit Feedback</h5>
-                <form id="feedback-form" method="post" action="{% url 'feedback_create' %}">
-                    {% csrf_token %}
-                    <textarea id="feedback-message" name="message" placeholder="Write your feedback here" class="form-control" rows="4" required></textarea>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+        <!-- FAQs Page -->
+        <div id="faq-section">
+            <h5><a href="{% url 'faq_page' %}" target="_blank">FAQs</a></h5>
         </div>
+
+        <!-- Support Ticket Form -->
+        <div id="support-ticket-section">
+            <h5>Create a Support Ticket</h5>
+            <form id="support-ticket-form" method="post">
+                {% csrf_token %}
+                <input type="text" id="ticket-subject" name="subject" placeholder="Enter the subject of your issue" class="form-control" required>
+                <textarea id="ticket-description" name="description" placeholder="Describe your issue in detail" class="form-control" rows="4" required></textarea>
+                
+                <!-- Priority Dropdown -->
+                <label for="ticket-priority" class="form-label mt-2">Priority:</label>
+                <select id="ticket-priority" name="priority" class="form-control" required>
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+
+        <!-- Feedback Form -->
+        <div id="feedback-section">
+            <h5>Submit Feedback</h5>
+            <form id="feedback-form" method="post" action="{% url 'feedback_create' %}">
+                {% csrf_token %}
+                <textarea id="feedback-message" name="message" placeholder="Write your feedback here" class="form-control" rows="4" required></textarea>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
     </div>
 
     <!-- Scripts -->
@@ -306,7 +356,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'cloudinary/js/jquery.cloudinary.js' %}"></script>
-    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'js/sidebar.js' %}"></script>
     <script src="{% static 'js/grant_call_form.js' %}"></script>
     <script src="{% static 'js/grant_call_favorites.js' %}"></script>
     <script src="{% static 'js/support.js' %}"></script>
@@ -317,3 +367,4 @@
     <script src="{% static 'js/apply.js' %}"></script>
 </body>
 </html>
+            
