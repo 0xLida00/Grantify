@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const todoList = document.getElementById('todo-list');
     const todoForm = document.getElementById('todo-form');
     const todoTitleInput = document.getElementById('todo-title');
+    const todoDescriptionInput = document.getElementById('todo-description');
     const paginationNav = document.createElement('nav');
     paginationNav.className = 'mt-3';
     todoList.parentNode.appendChild(paginationNav);
@@ -25,7 +26,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const li = document.createElement('li');
                     li.className = 'list-group-item d-flex justify-content-between align-items-center';
                     li.innerHTML = `
-                        <span>${todo.completed ? `<del>${todo.title}</del>` : todo.title}</span>
+                        <a href="/todos/${todo.id}/" class="text-decoration-none">
+                            ${todo.completed ? `<del>${todo.title}</del>` : todo.title}
+                        </a>
                         <div>
                             <button class="btn btn-sm ${todo.completed ? 'btn-secondary' : 'btn-success'} toggle-btn" data-id="${todo.id}" data-completed="${todo.completed}">
                                 ${todo.completed ? 'Undo' : 'Complete'}
@@ -53,48 +56,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error fetching to-dos:', error));
     }
 
-    function updatePagination(data) {
-        paginationNav.innerHTML = '';
-
-        const pagination = document.createElement('ul');
-        pagination.className = 'pagination justify-content-center';
-
-        if (data.previous) {
-            const prevLi = document.createElement('li');
-            prevLi.className = 'page-item';
-            prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>`;
-            pagination.appendChild(prevLi);
-        }
-
-        for (let i = 1; i <= Math.ceil(data.count / data.page_size); i++) {
-            const pageLi = document.createElement('li');
-            pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
-            pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
-            pagination.appendChild(pageLi);
-        }
-
-        if (data.next) {
-            const nextLi = document.createElement('li');
-            nextLi.className = 'page-item';
-            nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>`;
-            pagination.appendChild(nextLi);
-        }
-
-        paginationNav.appendChild(pagination);
-
-        pagination.querySelectorAll('.page-link').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                currentPage = parseInt(this.dataset.page);
-                fetchTodos(currentPage);
-            });
-        });
-    }
-
     // Add a new to-do item
     todoForm.addEventListener('submit', event => {
         event.preventDefault();
         const title = todoTitleInput.value;
+        const description = todoDescriptionInput.value;
 
         fetch(apiBaseUrl, {
             method: 'POST',
@@ -102,53 +68,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken(),
             },
-            body: JSON.stringify({ title }),
+            body: JSON.stringify({ title, description }),
         })
             .then(response => {
                 if (response.ok) {
                     todoTitleInput.value = '';
+                    todoDescriptionInput.value = '';
                     fetchTodos(currentPage);
                 } else {
                     console.error('Error adding to-do:', response);
                 }
             });
     });
-
-    function toggleTodo(id, completed) {
-        fetch(`${apiBaseUrl}${id}/`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken(),
-            },
-            body: JSON.stringify({ completed: !completed }),
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchTodos(currentPage);
-                } else {
-                    console.error('Error toggling to-do:', response);
-                }
-            });
-    }
-
-    // Delete a to-do item
-    function deleteTodo(id) {
-        fetch(`${apiBaseUrl}${id}/`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken(),
-            },
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchTodos(currentPage);
-                } else {
-                    console.error('Error deleting to-do:', response);
-                }
-            });
-    }
 
     function getCSRFToken() {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');

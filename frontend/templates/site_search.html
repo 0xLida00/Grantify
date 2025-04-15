@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Search Results</h1>
+    {% if query %}
+        <p>Results for "<strong>{{ query }}</strong>":</p>
+
+        <!-- Proposals -->
+        <h3>Proposals</h3>
+        {% if proposals %}
+            <ul>
+                {% for proposal in proposals %}
+                    <li>
+                        <a href="{% url 'proposal_detail' proposal.pk %}">{{ proposal.title }}</a>
+                        - {{ proposal.description|slice:":50" }}{% if proposal.description|length > 50 %}...{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No proposals found.</p>
+        {% endif %}
+
+        <!-- Tickets -->
+        <h3>Support Tickets</h3>
+        {% if tickets %}
+            <ul>
+                {% for ticket in tickets %}
+                    <li>
+                        <a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.subject }}</a>
+                        - {{ ticket.description|slice:":50" }}{% if ticket.description|length > 50 %}...{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No tickets found.</p>
+        {% endif %}
+
+        <!-- Reports -->
+        <h3>Reports</h3>
+        {% if reports %}
+            <ul>
+                {% for report in reports %}
+                    <li>
+                        <a href="{% url 'report_detail' report.pk %}">Report by {{ report.generated_by.username|default:"System" }}</a>
+                        - {{ report.generated_at }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reports found.</p>
+        {% endif %}
+
+        <!-- FAQs -->
+        <h3>FAQs</h3>
+        {% if faqs %}
+            <ul>
+                {% for faq in faqs %}
+                    <li>
+                        <a href="{% url 'faq_detail' faq.pk %}">{{ faq.question }}</a>
+                        - {{ faq.answer|slice:":50" }}{% if faq.answer|length > 50 %}...{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No FAQs found.</p>
+        {% endif %}
+
+        <!-- ToDos -->
+        <h3>To-Dos</h3>
+        {% if todos %}
+            <ul>
+                {% for todo in todos %}
+                    <li>
+                        <a href="{% url 'todo_detail' todo.pk %}">{{ todo.title }}</a>
+                        - {{ todo.description|slice:":50" }}{% if todo.description|length > 50 %}...{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No To-Dos found.</p>
+        {% endif %}
+    {% else %}
+        <p>Please enter a search query.</p>
+    {% endif %}
+</div>
+{% endblock %}

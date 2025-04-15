@@ -6,9 +6,12 @@
     <h1>To-Do List</h1>
     <form id="todo-form" class="mb-3">
         {% csrf_token %}
-        <div class="input-group">
-            <input type="text" id="todo-title" class="form-control" placeholder="Enter a new task" required>
+        <div class="input-group mb-3">
+            <input type="text" id="todo-title" class="form-control" placeholder="Enter a new task title" required>
             <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+        <div class="mb-3">
+            <textarea id="todo-description" class="form-control" placeholder="Enter a description (optional)" rows="3"></textarea>
         </div>
     </form>
     <ul id="todo-list" class="list-group"></ul>

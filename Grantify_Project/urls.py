@@ -32,4 +32,5 @@ urlpatterns = [
     path('alerts/', include('alerts_app.urls')),
     path('reports/', include('reports_app.urls')),
     path('audit/', include('audit_app.urls')),
+    path('search/', include('frontend.urls')), 
 ]

@@ -304,24 +304,33 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        grant_call = self.get_object()
         if self.request.POST:
-            context["question_formset"] = GrantQuestionFormSet(self.request.POST, instance=self.get_object())
+            context["question_formset"] = GrantQuestionFormSet(self.request.POST, instance=grant_call)
         else:
-            context["question_formset"] = GrantQuestionFormSet(instance=self.get_object())
+            context["question_formset"] = GrantQuestionFormSet(instance=grant_call)
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
         question_formset = context["question_formset"]
 
+        # Validate the formset before accessing cleaned_data
         if form.is_valid() and question_formset.is_valid():
+            # Debugging: Check each form in the formset after validation
+            for i, question_form in enumerate(question_formset):
+                print(f"Form {i} data:", question_form.cleaned_data)
+
+            # Save the main GrantCall form
             grant_call = form.save(commit=False)
             grant_call.modified_by = self.request.user
             grant_call.save()
 
+            # Save the formset (questions)
             question_formset.instance = grant_call
             question_formset.save()
 
+            # Log the update
             LogEntry.objects.create(
                 user=self.request.user,
                 action="Grant Call Updated",
@@ -331,6 +340,7 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                 source="User",
             )
 
+            # Success message and redirect
             messages.success(self.request, "Grant call updated successfully!")
             return redirect(self.success_url)
         else:
@@ -339,7 +349,13 @@ class GrantCallUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_invalid(self, form):
         context = self.get_context_data()
         question_formset = context["question_formset"]
-        return self.render_to_response(self.get_context_data(form=form))
+
+        # Debugging: Log errors and submitted data
+        print("Form invalid. Errors:", form.errors)
+        print("Formset invalid. Errors:", question_formset.errors)
+        print("Submitted POST data:", self.request.POST)
+
+        return self.render_to_response(self.get_context_data(form=form, question_formset=question_formset))
 
 
 # Grant Call Delete View

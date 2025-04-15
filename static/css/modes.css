@@ -1,0 +1,178 @@
+/* General Button Styles */
+.btn {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+body.dark {
+    color: white;
+}
+  
+/* Outlined Buttons */
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+  
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+  
+.btn-outline-success {
+    color: #28a745;
+    border-color: #28a745;
+}
+  
+.btn-outline-success:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+  
+.btn-outline-info {
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+  
+.btn-outline-info:hover {
+    background-color: #17a2b8;
+    color: #fff;
+}
+  
+.btn-outline-warning {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+  
+.btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: #000;
+}
+  
+.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+  
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+  
+/* Dark Mode Buttons */
+body.dark .btn-primary {
+    background-color: #0056b3;
+    color: #fff;
+    border-color: #0056b3;
+}
+  
+body.dark .btn-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+  
+body.dark .btn-secondary {
+    background-color: #444;
+    color: #fff;
+    border-color: #444;
+}
+  
+body.dark .btn-secondary:hover {
+    background-color: #555;
+    border-color: #555;
+}
+  
+body.dark .btn-info {
+    background-color: #117a8b;
+    color: #fff;
+    border-color: #117a8b;
+}
+  
+body.dark .btn-info:hover {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+  
+body.dark .btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+  
+body.dark .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+  
+body.dark .btn-outline-success {
+    color: #28a745;
+    border-color: #28a745;
+}
+  
+body.dark .btn-outline-success:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+  
+body.dark .btn-outline-info {
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+  
+body.dark .btn-outline-info:hover {
+    background-color: #17a2b8;
+    color: #fff;
+}
+  
+body.dark .btn-outline-warning {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+  
+body.dark .btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: #000;
+}
+  
+body.dark .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+  
+body.dark .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+  
+/* Card Styles */
+.card {
+    background-color: #fff;
+    color: #000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+  
+.card-header {
+    background-color: var(--primary-color);
+    color: #fff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+  
+.card-body {
+    background-color: var(--primary-color-light);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+  
+/* Dark Mode Cards */
+body.dark .card {
+    background-color: #242526;
+    color: #e0e0e0;
+}
+  
+body.dark .card-header {
+    background-color: #3a3b3c;
+    color: #fff;
+}
+  
+body.dark .card-body {
+    background-color: #3a3b3c;
+    color: #ccc;
+}

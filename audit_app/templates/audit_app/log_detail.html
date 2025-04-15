@@ -2,19 +2,27 @@
 {% load static %}
 
 {% block content %}
-<h1>Log Details</h1>
-<p><strong>Action:</strong> {{ log.action }}</p>
-<p><strong>User:</strong> 
-    {% if log.user %}
-        {{ log.user.username }}
-    {% else %}
-        System
-    {% endif %}
-</p>
-<p><strong>Object:</strong> {{ log.object_repr }}</p>
-<p><strong>Change Message:</strong> {{ log.change_message }}</p>
-<p><strong>Log Level:</strong> {{ log.get_log_level_display }}</p>
-<p><strong>Source:</strong> {{ log.source }}</p>
-<p><strong>Created At:</strong> {{ log.created_at }}</p>
-<a href="{% url 'log_list' %}" class="btn btn-secondary">Back to Logs</a>
+<div class="container mt-4">
+    <h1 class="mb-4">Log Details</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p><strong>Action:</strong> {{ log.action }}</p>
+            <p><strong>User:</strong> 
+                {% if log.user %}
+                    {{ log.user.username }}
+                {% else %}
+                    System
+                {% endif %}
+            </p>
+            <p><strong>Object:</strong> {{ log.object_repr }}</p>
+            <p><strong>Change Message:</strong> {{ log.change_message }}</p>
+            <p><strong>Log Level:</strong> {{ log.get_log_level_display }}</p>
+            <p><strong>Source:</strong> {{ log.source }}</p>
+            <p><strong>Created At:</strong> {{ log.created_at }}</p>
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'log_list' %}" class="btn btn-secondary">Back to Logs</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

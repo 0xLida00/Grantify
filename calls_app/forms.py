@@ -20,7 +20,7 @@ class GrantCallForm(forms.ModelForm):
 class GrantQuestionForm(forms.ModelForm):
     class Meta:
         model = GrantQuestion
-        fields = ["question_text", "question_type", "choices_text"]
+        fields = ["id", "question_text", "question_type", "choices_text"]
         widgets = {
             "question_text": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter question text"}),
             "question_type": forms.Select(attrs={"class": "form-control"}),

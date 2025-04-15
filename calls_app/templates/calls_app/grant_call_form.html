@@ -7,6 +7,7 @@
     <form method="post" novalidate>
         {% csrf_token %}
         
+        <!-- Main Form Fields -->
         {% for field in form %}
         <div class="form-group">
             {{ field.label_tag }}
@@ -21,12 +22,16 @@
         </div>
         {% endfor %}
         
+        <!-- Questions Section -->
         <h4>Questions</h4>
         {{ question_formset.management_form }}
         <div id="questions-container">
             {% for question_form in question_formset %}
             <div class="card mb-3 question-form">
                 <div class="card-body">
+                    <!-- Hidden ID Field -->
+                    {{ question_form.id }}
+    
                     <!-- Question Text -->
                     <div class="form-group">
                         {{ question_form.question_text.label_tag }}
@@ -39,6 +44,7 @@
                         </div>
                         {% endif %}
                     </div>
+    
                     <!-- Question Type -->
                     <div class="form-group">
                         {{ question_form.question_type.label_tag }}
@@ -51,6 +57,7 @@
                         </div>
                         {% endif %}
                     </div>
+    
                     <!-- Choices Section -->
                     <div class="choices-section" style="display: none;">
                         <h5>Choices</h5>
@@ -72,6 +79,7 @@
             {% endfor %}
         </div>
     
+        <!-- Buttons -->
         <button type="button" class="btn btn-success" id="add-question">Add Question</button>
         <button type="submit" class="btn btn-primary">Save</button>
         <a href="{% url 'grant_call_list' %}" class="btn btn-secondary">Cancel</a>

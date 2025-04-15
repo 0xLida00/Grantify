@@ -2,50 +2,53 @@
 {% load static %}
 
 {% block content %}
-<h1>Ticket Details</h1>
-<div class="card">
-    <div class="card-header">
-        <h4>Ticket ID: {{ ticket.id }}</h4>
-    </div>
-    <div class="card-body">
-        <p><strong>User:</strong> {{ ticket.user.username }}</p>
-        <p><strong>Subject:</strong> {{ ticket.subject }}</p>
-        <p><strong>Description:</strong> {{ ticket.description }}</p>
-        <p><strong>Priority:</strong> 
-            <span class="badge badge-{% if ticket.priority == 'high' %}danger{% elif ticket.priority == 'medium' %}warning{% else %}success{% endif %}">
-                {{ ticket.priority|capfirst }}
-            </span>
-        </p>
-        <p><strong>Status:</strong> 
-            <span class="badge badge-{% if ticket.status == 'open' %}primary{% elif ticket.status == 'in_progress' %}info{% elif ticket.status == 'resolved' %}success{% else %}secondary{% endif %}">
-                {{ ticket.status|capfirst }}
-            </span>
-        </p>
-        <p><strong>Updates:</strong></p>
-        <div class="alert alert-info">
-            {{ ticket.response|default:"No response yet"|linebreaksbr }}
+<div class="container mt-4">
+    <h1 class="mb-4">Ticket Details</h1>
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h4>Ticket ID: {{ ticket.id }}</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>User:</strong> {{ ticket.user.username }}</p>
+            <p><strong>Subject:</strong> {{ ticket.subject }}</p>
+            <p><strong>Description:</strong> {{ ticket.description }}</p>
+            <p><strong>Priority:</strong> 
+                <span class="badge badge-{% if ticket.priority == 'high' %}danger{% elif ticket.priority == 'medium' %}warning{% else %}success{% endif %}">
+                    {{ ticket.priority|capfirst }}
+                </span>
+            </p>
+            <p><strong>Status:</strong> 
+                <span class="badge badge-{% if ticket.status == 'open' %}primary{% elif ticket.status == 'in_progress' %}info{% elif ticket.status == 'resolved' %}success{% else %}secondary{% endif %}">
+                    {{ ticket.status|capfirst }}
+                </span>
+            </p>
+            <p><strong>Updates:</strong></p>
+            <div class="alert alert-info">
+                {{ ticket.response|default:"No response yet"|linebreaksbr }}
+            </div>
         </div>
     </div>
-</div>
 
-<h2>Send an Update</h2>
-<form method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="admin_response">Your Response</label>
-        <textarea name="admin_response" id="admin_response" class="form-control" rows="4" placeholder="Write your response..."></textarea>
-    </div>
-    <div class="form-group">
-        <label for="status">Status</label>
-        <select name="status" id="status" class="form-control">
-            <option value="open" {% if ticket.status == 'open' %}selected{% endif %}>Open</option>
-            <option value="in_progress" {% if ticket.status == 'in_progress' %}selected{% endif %}>In Progress</option>
-            <option value="resolved" {% if ticket.status == 'resolved' %}selected{% endif %}>Resolved</option>
-            <option value="closed" {% if ticket.status == 'closed' %}selected{% endif %}>Closed</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Send Update</button>
-    <a href="{% url 'admin_ticket_list' %}" class="btn btn-secondary mx-2">Back</a>
-</form>
-<br>
+    <h2 class="mt-4">Send an Update</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="admin_response">Your Response</label>
+            <textarea name="admin_response" id="admin_response" class="form-control" rows="4" placeholder="Write your response..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select name="status" id="status" class="form-control">
+                <option value="open" {% if ticket.status == 'open' %}selected{% endif %}>Open</option>
+                <option value="in_progress" {% if ticket.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="resolved" {% if ticket.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                <option value="closed" {% if ticket.status == 'closed' %}selected{% endif %}>Closed</option>
+            </select>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">Send Update</button>
+            <a href="{% url 'admin_ticket_list' %}" class="btn btn-secondary mx-2">Back</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

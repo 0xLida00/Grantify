@@ -4,20 +4,26 @@
 {% block content %}
 <div class="container mt-4">
     <h1>Feedback Details</h1>
-    <table class="table table-bordered">
-        <tr>
-            <th>User</th>
-            <td>{{ feedback.user.username }}</td>
-        </tr>
-        <tr>
-            <th>Message</th>
-            <td>{{ feedback.message }}</td>
-        </tr>
-        <tr>
-            <th>Created At</th>
-            <td>{{ feedback.created_at }}</td>
-        </tr>
-    </table>
-    <a href="{% url 'feedback_list' %}" class="btn btn-secondary">Back to Feedback List</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <th>User</th>
+                    <td>{{ feedback.user.username }}</td>
+                </tr>
+                <tr>
+                    <th>Message</th>
+                    <td>{{ feedback.message }}</td>
+                </tr>
+                <tr>
+                    <th>Created At</th>
+                    <td>{{ feedback.created_at }}</td>
+                </tr>
+            </table>
+            <div class="d-flex justify-content-end">
+                <a href="{% url 'feedback_list' %}" class="btn btn-secondary">Back to Feedback List</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

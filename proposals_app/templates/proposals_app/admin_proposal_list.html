@@ -2,130 +2,132 @@
 {% load static %}
 
 {% block content %}
-<h1>Proposals</h1>
+<div class="container">
+    <h1>Admin Proposals</h1>
 
-<!-- Filter Form -->
-<form method="get" class="mb-3">
-    <div class="row">
-        <div class="col-md-4">
-            <select name="grant_call" class="form-control mb-2">
-                <option value="">All Grant Calls</option>
-                {% for call in grant_calls %}
-                <option value="{{ call.id }}" {% if call.id|stringformat:"s" == selected_grant_call %}selected{% endif %}>
-                    {{ call.title }}
-                </option>
-                {% endfor %}
-            </select>
+    <!-- Filter Form -->
+    <form method="get" class="mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <select name="grant_call" class="form-control mb-2">
+                    <option value="">All Grant Calls</option>
+                    {% for call in grant_calls %}
+                    <option value="{{ call.id }}" {% if call.id|stringformat:"s" == selected_grant_call %}selected{% endif %}>
+                        {{ call.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-control mb-2">
+                    <option value="">All Statuses</option>
+                    <option value="submitted" {% if selected_status == "submitted" %}selected{% endif %}>Submitted</option>
+                    <option value="under_review" {% if selected_status == "under_review" %}selected{% endif %}>Under Review</option>
+                    <option value="accepted" {% if selected_status == "accepted" %}selected{% endif %}>Accepted</option>
+                    <option value="rejected" {% if selected_status == "rejected" %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
         </div>
-        <div class="col-md-4">
-            <select name="status" class="form-control mb-2">
-                <option value="">All Statuses</option>
-                <option value="submitted" {% if selected_status == "submitted" %}selected{% endif %}>Submitted</option>
-                <option value="under_review" {% if selected_status == "under_review" %}selected{% endif %}>Under Review</option>
-                <option value="accepted" {% if selected_status == "accepted" %}selected{% endif %}>Accepted</option>
-                <option value="rejected" {% if selected_status == "rejected" %}selected{% endif %}>Rejected</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">Filter</button>
-        </div>
-    </div>
-</form>
+    </form>
 
-<!-- Proposals Table -->
-<table class="table table-bordered table-hover">
-    <thead class="thead-light">
-        <tr>
-            <th>Title</th>
-            <th>Applicant</th>
-            <th>Grant Call</th>
-            <th>Status</th>
-            <th>Evaluator</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for proposal in page_obj %}
-        <tr>
-            <td>{{ proposal.title }}</td>
-            <td>{{ proposal.applicant.username }}</td>
-            <td>{{ proposal.grant_call }}</td>
-            <td>
-                <span class="badge 
-                    {% if proposal.status == 'draft' %}badge-secondary
-                    {% elif proposal.status == 'submitted' %}badge-primary
-                    {% elif proposal.status == 'under_review' %}badge-warning
-                    {% elif proposal.status == 'accepted' %}badge-success
-                    {% elif proposal.status == 'rejected' %}badge-danger
-                    {% else %}badge-light{% endif %}">
-                    {{ proposal.get_status_display }}
-                </span>
-            </td>
-            <td>
-                <form method="post" class="d-inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="proposal_id" value="{{ proposal.id }}">
-                    <select name="evaluator_id" class="form-control form-control-sm d-inline w-auto" 
-                        {% if proposal.status == 'draft' %}disabled{% endif %}>
-                        <option value="">Assign/Reassign Evaluator</option>
-                        {% for evaluator in evaluators %}
-                        <option value="{{ evaluator.id }}" {% if proposal.evaluator and proposal.evaluator.id == evaluator.id %}selected{% endif %}>
-                            {{ evaluator.username }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-success btn-sm" 
-                        {% if proposal.status == 'draft' %}disabled{% endif %}>
-                        Assign
-                    </button>
-                </form>
-            </td>
-            <td>
-                <a href="{% url 'proposals_app:admin_proposal_detail' proposal.pk %}" class="btn btn-info btn-sm">View</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- Proposals Table -->
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Title</th>
+                <th>Applicant</th>
+                <th>Grant Call</th>
+                <th>Status</th>
+                <th>Evaluator</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proposal in page_obj %}
+            <tr>
+                <td>{{ proposal.title }}</td>
+                <td>{{ proposal.applicant.username }}</td>
+                <td>{{ proposal.grant_call }}</td>
+                <td>
+                    <span class="badge 
+                        {% if proposal.status == 'draft' %}badge-secondary
+                        {% elif proposal.status == 'submitted' %}badge-primary
+                        {% elif proposal.status == 'under_review' %}badge-warning
+                        {% elif proposal.status == 'accepted' %}badge-success
+                        {% elif proposal.status == 'rejected' %}badge-danger
+                        {% else %}badge-light{% endif %}">
+                        {{ proposal.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="proposal_id" value="{{ proposal.id }}">
+                        <select name="evaluator_id" class="form-control form-control-sm d-inline w-auto" 
+                            {% if proposal.status == 'draft' %}disabled{% endif %}>
+                            <option value="">Assign/Reassign Evaluator</option>
+                            {% for evaluator in evaluators %}
+                            <option value="{{ evaluator.id }}" {% if proposal.evaluator and proposal.evaluator.id == evaluator.id %}selected{% endif %}>
+                                {{ evaluator.username }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-success btn-sm" 
+                            {% if proposal.status == 'draft' %}disabled{% endif %}>
+                            Assign
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <a href="{% url 'proposals_app:admin_proposal_detail' proposal.pk %}" class="btn btn-info btn-sm">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-{% if page_obj.object_list|length == 0 %}
-<p class="text-center mt-4">No proposals found.</p>
-{% endif %}
+    {% if page_obj.object_list|length == 0 %}
+    <p class="text-center mt-4">No proposals found.</p>
+    {% endif %}
 
-<!-- Pagination Controls -->
-<div class="d-flex justify-content-center">
-    <nav>
-        <ul class="pagination">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1">First</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            </li>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                </li>
-                {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-center">
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                 </li>
                 {% endif %}
-            {% endfor %}
 
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
 </div>
 {% endblock %}

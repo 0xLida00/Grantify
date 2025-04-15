@@ -2,118 +2,120 @@
 {% load static %}
 
 {% block content %}
-<h1>Monitor Evaluations</h1>
+<div class="container">
+    <h1>Monitor Evaluations</h1>
 
-<!-- Filter Form -->
-<form method="get" class="mb-3">
-    <div class="row">
-        <div class="col-md-4">
-            <select name="status" class="form-control mb-2">
-                <option value="">All Statuses</option>
-                <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
-                <option value="in_progress" {% if status_filter == "in_progress" %}selected{% endif %}>In Progress</option>
-                <option value="completed" {% if status_filter == "completed" %}selected{% endif %}>Completed</option>
-            </select>
+    <!-- Filter Form -->
+    <form method="get" class="mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <select name="status" class="form-control mb-2">
+                    <option value="">All Statuses</option>
+                    <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
+                    <option value="in_progress" {% if status_filter == "in_progress" %}selected{% endif %}>In Progress</option>
+                    <option value="completed" {% if status_filter == "completed" %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="evaluator" class="form-control mb-2">
+                    <option value="">All Evaluators</option>
+                    {% for evaluator in evaluators %}
+                    <option value="{{ evaluator.id }}" {% if evaluator.id|stringformat:"s" == evaluator_filter %}selected{% endif %}>
+                        {{ evaluator.username }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
         </div>
-        <div class="col-md-4">
-            <select name="evaluator" class="form-control mb-2">
-                <option value="">All Evaluators</option>
-                {% for evaluator in evaluators %}
-                <option value="{{ evaluator.id }}" {% if evaluator.id|stringformat:"s" == evaluator_filter %}selected{% endif %}>
-                    {{ evaluator.username }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">Filter</button>
-        </div>
-    </div>
-</form>
+    </form>
 
-<!-- Evaluations Table -->
-<table class="table table-bordered table-hover">
-    <thead class="thead-light">
-        <tr>
-            <th>Proposal</th>
-            <th>Evaluator</th>
-            <th>Score</th>
-            <th>Status</th>
-            <th>Feedback</th>
-            <th>Evaluated At</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for evaluation in evaluations %}
-        <tr>
-            <td>{{ evaluation.proposal.title }}</td>
-            <td>{{ evaluation.evaluator.username }}</td>
-            <td>{{ evaluation.score }}</td>
-            <td>
-                <span class="badge 
-                    {% if evaluation.status == 'pending' %}badge-secondary
-                    {% elif evaluation.status == 'in_progress' %}badge-warning
-                    {% elif evaluation.status == 'completed' %}badge-success
-                    {% endif %}">
-                    {{ evaluation.get_status_display }}
-                </span>
-            </td>
-            <td>
-                <div class="d-flex justify-content-between">
-                    <span>
-                        {% if evaluation.feedback %}
-                        {{ evaluation.feedback|slice:":20" }}
-                        {% else %}
-                        No feedback provided
-                        {% endif %}
+    <!-- Evaluations Table -->
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Proposal</th>
+                <th>Evaluator</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Feedback</th>
+                <th>Evaluated At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for evaluation in evaluations %}
+            <tr>
+                <td>{{ evaluation.proposal.title }}</td>
+                <td>{{ evaluation.evaluator.username }}</td>
+                <td>{{ evaluation.score }}</td>
+                <td>
+                    <span class="badge 
+                        {% if evaluation.status == 'pending' %}badge-secondary
+                        {% elif evaluation.status == 'in_progress' %}badge-warning
+                        {% elif evaluation.status == 'completed' %}badge-success
+                        {% endif %}">
+                        {{ evaluation.get_status_display }}
                     </span>
-                    <a href="{% url 'feedback_detail' evaluation.pk %}" class="btn btn-primary btn-sm">View</a>
-                </div>
-            </td>
-            <td>{{ evaluation.evaluated_at }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                </td>
+                <td>
+                    <div class="d-flex justify-content-between">
+                        <span>
+                            {% if evaluation.feedback %}
+                            {{ evaluation.feedback|slice:":20" }}
+                            {% else %}
+                            No feedback provided
+                            {% endif %}
+                        </span>
+                        <a href="{% url 'feedback_detail' evaluation.pk %}" class="btn btn-info btn-sm">View</a>
+                    </div>
+                </td>
+                <td>{{ evaluation.evaluated_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-{% if evaluations|length == 0 %}
-<p class="text-center mt-4">No evaluations found.</p>
-{% endif %}
+    {% if evaluations|length == 0 %}
+    <p class="text-center mt-4">No evaluations found.</p>
+    {% endif %}
 
-<!-- Pagination Controls -->
-<div class="d-flex justify-content-center mt-4">
-    <nav>
-        <ul class="pagination">
-            {% if evaluations.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">First</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ evaluations.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Previous</a>
-            </li>
-            {% endif %}
-
-            {% for num in evaluations.paginator.page_range %}
-                {% if evaluations.number == num %}
-                <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                </li>
-                {% elif num > evaluations.number|add:"-2" and num < evaluations.number|add:"2" %}
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-center">
+        <nav>
+            <ul class="pagination">
+                {% if evaluations.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">{{ num }}</a>
+                    <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ evaluations.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Previous</a>
                 </li>
                 {% endif %}
-            {% endfor %}
 
-            {% if evaluations.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ evaluations.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Next</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ evaluations.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Last</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+                {% for num in evaluations.paginator.page_range %}
+                    {% if evaluations.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > evaluations.number|add:"-2" and num < evaluations.number|add:"2" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if evaluations.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ evaluations.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ evaluations.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
 </div>
 {% endblock %}

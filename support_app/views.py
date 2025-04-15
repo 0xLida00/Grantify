@@ -11,11 +11,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils.decorators import method_decorator
 from .models import FAQ, SupportTicket, Feedback, ToDo
 from django.db.models import Q
 from .serializers import FAQSerializer, SupportTicketSerializer, FeedbackSerializer, ToDoSerializer
 from .forms import SupportTicketForm, FeedbackForm, FAQForm
-from django.views.generic import ListView
+from django.views import View
 from decouple import config
 
 
@@ -300,8 +301,8 @@ class ToDoListCreateView(APIView):
     def get(self, request):
         todos = ToDo.objects.filter(user=request.user).order_by('-created_at')
         paginator = ToDoPagination()
-        paginated_todos = paginator.paginate_queryset(todos, request)
-        serializer = ToDoSerializer(paginated_todos, many=True)
+        result_page = paginator.paginate_queryset(todos, request)
+        serializer = ToDoSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
@@ -332,3 +333,25 @@ class ToDoDetailView(APIView):
         todo = get_object_or_404(ToDo, pk=pk, user=request.user)
         todo.delete()
         return Response({"message": "To-Do item deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    
+
+@method_decorator(login_required, name='dispatch')
+class ToDoDetailHTMLView(View):
+    def get(self, request, pk):
+        todo = get_object_or_404(ToDo, pk=pk, user=request.user)
+        return render(request, 'support_app/todo_detail.html', {'todo': todo})
+
+    def post(self, request, pk):
+        todo = get_object_or_404(ToDo, pk=pk, user=request.user)
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        completed = request.POST.get('completed') == 'true'
+
+        # Update the task
+        todo.title = title
+        todo.description = description
+        todo.completed = completed
+        todo.save()
+
+        # Redirect to the To-Do list page
+        return redirect('todo_list')

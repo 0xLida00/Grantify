@@ -2,72 +2,83 @@
 {% load static %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Manage FAQs</h1>
-    <a href="{% url 'admin_faq_create' %}" class="btn btn-primary">Create FAQ</a>
-</div>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Question</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for faq in page_obj %}
-        <tr>
-            <td>{{ faq.id }}</td>
-            <td>{{ faq.question }}</td>
-            <td>{{ faq.status|capfirst }}</td>
-            <td>
-                <a href="{% url 'admin_faq_edit' faq.id %}" class="btn btn-sm btn-warning">Edit</a>
-                <a href="{% url 'admin_faq_delete' faq.id %}" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4" class="text-center">No FAQs available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage FAQs</h1>
+        <a href="{% url 'admin_faq_create' %}" class="btn btn-primary">Create FAQ</a>
+    </div>
 
-<!-- Pagination Controls -->
-<div class="d-flex justify-content-center mt-4">
-    <nav>
-        <ul class="pagination">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1">First</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            </li>
-            {% endif %}
+    <!-- FAQs Table -->
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Question</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for faq in page_obj %}
+            <tr>
+                <td>{{ faq.id }}</td>
+                <td>{{ faq.question }}</td>
+                <td>
+                    <span class="badge 
+                        {% if faq.status == 'active' %}badge-success
+                        {% elif faq.status == 'inactive' %}badge-secondary
+                        {% else %}badge-light{% endif %}">
+                        {{ faq.status|capfirst }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'admin_faq_edit' faq.id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'admin_faq_delete' faq.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No FAQs available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                </li>
-                {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-center">
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                 </li>
                 {% endif %}
-            {% endfor %}
 
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:"-2" and num < page_obj.number|add:"2" %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
 </div>
 {% endblock %}

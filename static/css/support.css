@@ -12,9 +12,9 @@
 
 /* Footer Styling */
 footer.footer .list-inline-item a {
-  font-size: 1rem; /* Icon size */
-  margin: 0 12px; /* Spacing between icons */
-  transition: color 0.3s ease-in-out; /* Smooth hover effect */
+  font-size: 1rem;
+  margin: 0 12px;
+  transition: color 0.3s ease-in-out;
 }
 
 /* Floating Support Icon */

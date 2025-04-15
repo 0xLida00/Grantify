@@ -15,8 +15,10 @@
 
     
     <!-- Custom styles -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms_tables.css' %}">
     <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/support.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -93,7 +95,7 @@
                 <!-- Search box within the sidebar -->
                 <li class="search-box">
                     <i class='bx bx-search icon'></i>
-                    <input type="text" placeholder="Search...">
+                    <input type="text" id="search-input" placeholder="Search..." data-search-url="{% url 'site_search' %}">
                 </li>
 
                 <!-- List of menu links -->
@@ -112,17 +114,18 @@
                     </li>
 
                     {% if user.is_authenticated %}
-                        <li>
-                            <a href="{% url 'favorite_grant_calls' %}">
-                                <i class='bx bx-heart icon'></i>
-                                <span class="text nav-text">Favorite Calls</span>
-                            </a>
-                        </li>
                         {% if user.is_staff %}
                             <li>            
                                 <a href="{% url 'proposals_app:admin_proposal_list' %}">
                                     <i class='bx bx-file icon'></i>
                                     <span class="text nav-text">Proposals</span>
+                                </a>
+                            </li>
+                        {% elif user.role == 'applicant' %}
+                            <li>
+                                <a href="{% url 'favorite_grant_calls' %}">
+                                    <i class='bx bx-heart icon'></i>
+                                    <span class="text nav-text">Favorite Calls</span>
                                 </a>
                             </li>                                
                         {% else %}
@@ -134,7 +137,6 @@
                             </li>
                         {% endif %}
                         
-
                     {% if user.role == 'evaluator' %}
                         <li>
                             <a href="{% url 'evaluator_dashboard' %}">
@@ -164,6 +166,12 @@
                             <a href="{% url 'monitor_evaluations' %}">
                                 <i class='bx bx-check-double icon'></i>
                                 <span class="text nav-text">Evaluations</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'todo_list' %}">
+                                <i class='bx bx-task icon'></i>
+                                <span class="text nav-text">To-Do List</span>
                             </a>
                         </li>
                         <li>
@@ -357,6 +365,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'cloudinary/js/jquery.cloudinary.js' %}"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="{% static 'js/search.js' %}"></script>
     <script src="{% static 'js/grant_call_form.js' %}"></script>
     <script src="{% static 'js/grant_call_favorites.js' %}"></script>
     <script src="{% static 'js/support.js' %}"></script>

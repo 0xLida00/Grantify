@@ -15,6 +15,7 @@ from .views import (
     vote_faq,
     ToDoListCreateView,
     ToDoDetailView,
+    ToDoDetailHTMLView,
     todo_page,
     faq_page,
     feedback_list,
@@ -40,5 +41,6 @@ urlpatterns = [
     path('faqs/<int:faq_id>/vote/', vote_faq, name='vote_faq'),
     path('api/todos/', ToDoListCreateView.as_view(), name='todo_list_create'),
     path('api/todos/<int:pk>/', ToDoDetailView.as_view(), name='todo_detail'),
+    path('todos/<int:pk>/', ToDoDetailHTMLView.as_view(), name='todo_detail'),
     path('todos/', todo_page, name='todo_list'),
 ]
