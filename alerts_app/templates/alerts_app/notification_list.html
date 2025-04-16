@@ -10,12 +10,16 @@
 
     <ul class="list-group">
         {% for notification in page_obj %}
-            <li class="list-group-item {% if not notification.is_read %}list-group-item-warning{% endif %}">
-                <p>{{ notification.message }}</p>
-                <small>{{ notification.created_at }}</small>
-                {% if not notification.is_read %}
-                    <a href="{% url 'mark_notification_as_read' notification.pk %}" class="btn btn-sm btn-primary mt-2">Mark as Read</a>
-                {% endif %}
+            <li class="list-group-item {% if not notification.is_read %}bg-secondary text-white{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1">{{ notification.message }}</p>
+                        <small>{{ notification.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    {% if not notification.is_read %}
+                        <a href="{% url 'mark_notification_as_read' notification.pk %}" class="btn btn-sm btn-primary">Mark as Read</a>
+                    {% endif %}
+                </div>
             </li>
         {% empty %}
             <li class="list-group-item text-center">

@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch((error) => {
                     console.error("Error submitting support ticket:", error);
-                    displayFlashMessage("An error occurred. Please try again later.", "danger");
+                    displayFlashMessage("An unexpected error occurred while submitting your support ticket. Please try again later if the issue persists.", "danger");
                 });
         });
     }
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch((error) => {
                     console.error("Error submitting feedback:", error);
-                    displayFlashMessage("An error occurred. Please try again later.", "danger");
+                    displayFlashMessage("An unexpected error occurred while submitting your feedback. Please try again later or contact support if the issue persists.", "danger");
                 });
         });
     }

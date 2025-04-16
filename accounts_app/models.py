@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
@@ -47,8 +47,12 @@ class CustomUser(AbstractUser):
                     if img.height > 300 or img.width > 300:
                         img.thumbnail((300, 300))
                         img.save(img_path)
-            except Exception as e:
-                print(f"Error processing profile picture: {e}")
+            except FileNotFoundError:
+                print(f"Profile picture file not found: {self.profile_picture.name}")
+            except UnidentifiedImageError:
+                print(f"Invalid image file: {self.profile_picture.name}")
+            except OSError as e:
+                print(f"OS error while processing profile picture: {e}")
 
 
 class MyModel(models.Model):
