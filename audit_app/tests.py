@@ -77,8 +77,7 @@ class AuditAppViewsTestCase(TestCase):
         response = self.client.get(reverse('log_list') + '?page=2')
         self.assertEqual(response.status_code, 200)
 
-        # Filter logs created specifically for this test
-        logs_for_test = LogEntry.objects.filter(action__startswith="Log entry")
+        logs_for_test = LogEntry.objects.filter(action__startswith="Log entry").order_by('-created_at')
         paginator = Paginator(logs_for_test, 25)
         second_page_logs = paginator.get_page(2)
 

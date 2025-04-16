@@ -2,48 +2,52 @@
 {% load static %}
 
 {% block content %}
-<h1>Submit Evaluation</h1>
-<h3>Proposal: {{ evaluation.proposal.title }}</h3>
-<p><strong>Description:</strong> {{ evaluation.proposal.description }}</p>
+<div class="container mt-4">
+    <h1>Submit Evaluation</h1>
+    <h3>Proposal: {{ evaluation.proposal.title }}</h3>
+    <p><strong>Description:</strong> {{ evaluation.proposal.description }}</p>
 
-<h4>Questions and Answers</h4>
-<ul>
-    {% for item in questions_with_responses %}
-    <li>
-        <strong>{{ item.question.question_text }}</strong><br>
-        Answer: {{ item.response.response|default:"No response provided" }}
-    </li>
-    {% endfor %}
-</ul>
+    <h4>Questions and Answers</h4>
+    <ul>
+        {% for item in questions_with_responses %}
+        <li>
+            <strong>{{ item.question.question_text }}</strong><br>
+            Answer: {{ item.response.response|default:"No response provided" }}
+        </li>
+        {% endfor %}
+    </ul>
 
-<form method="post" novalidate>
-    {% csrf_token %}
-    
-    <div class="form-group">
-        {{ form.score.label_tag }}
-        {{ form.score }}
-        {% if form.score.errors %}
-        <div class="invalid-feedback d-block">
-            {% for error in form.score.errors %}
-            <small>{{ error }}</small><br>
-            {% endfor %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.score.label_tag }}
+            {{ form.score }}
+            {% if form.score.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.score.errors %}
+                <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
 
-    <div class="form-group">
-        {{ form.feedback.label_tag }}
-        {{ form.feedback }}
-        {% if form.feedback.errors %}
-        <div class="invalid-feedback d-block">
-            {% for error in form.feedback.errors %}
-            <small>{{ error }}</small><br>
-            {% endfor %}
+        <div class="form-group">
+            {{ form.feedback.label_tag }}
+            {{ form.feedback }}
+            {% if form.feedback.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.feedback.errors %}
+                <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
-    <a href="{% url 'evaluator_dashboard' %}" class="btn btn-secondary">Cancel</a>
-</form>
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="{% url 'evaluator_dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

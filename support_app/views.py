@@ -347,11 +347,9 @@ class ToDoDetailHTMLView(View):
         description = request.POST.get('description')
         completed = request.POST.get('completed') == 'true'
 
-        # Update the task
         todo.title = title
         todo.description = description
         todo.completed = completed
         todo.save()
 
-        # Redirect to the To-Do list page
         return redirect('todo_list')

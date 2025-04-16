@@ -82,7 +82,7 @@ class EvaluationAppTests(TestCase):
     def test_submit_evaluation_invalid_score(self):
         self.client.login(username='evaluator', password='password')
         response = self.client.post(reverse('submit_evaluation', args=[self.evaluation.id]), {
-            'score': 15,  # Invalid score
+            'score': 15,
             'feedback': 'Invalid score test.'
         })
         self.assertEqual(response.status_code, 200)

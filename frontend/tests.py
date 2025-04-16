@@ -11,11 +11,13 @@ class HomePageTest(LiveServerTestCase):
     def tearDown(self):
         self.driver.quit()
 
+    # Test: Home page loads with the correct header
     def test_homepage_loads(self):
         self.driver.get(self.live_server_url)
         header = self.driver.find_element(By.TAG_NAME, "h1").text
-        self.assertEqual(header, "Grantify")
+        self.assertEqual(header, "Welcome to Grantify")
 
+    # Test: Login button redirects to the login page
     def test_login_button_redirects(self):
         self.driver.get(self.live_server_url)
         login_button = self.driver.find_element(By.LINK_TEXT, "Login")
