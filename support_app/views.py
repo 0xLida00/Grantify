@@ -1,4 +1,4 @@
-import json, time
+import json, time, logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
@@ -19,6 +19,7 @@ from .forms import SupportTicketForm, FeedbackForm, FAQForm
 from django.views import View
 from decouple import config
 
+logger = logging.getLogger(__name__)
 
 # Support Center View
 def support_center(request):
@@ -299,6 +300,7 @@ class ToDoListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        logger.info(f"Fetching to-dos for user: {request.user}")
         todos = ToDo.objects.filter(user=request.user).order_by('-created_at')
         paginator = ToDoPagination()
         result_page = paginator.paginate_queryset(todos, request)
@@ -306,10 +308,13 @@ class ToDoListCreateView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
+        logger.info(f"Creating a new to-do for user: {request.user}")
         serializer = ToDoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            logger.info(f"To-Do created successfully for user: {request.user}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        logger.error(f"Error creating to-do: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -327,11 +332,13 @@ class ToDoDetailView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+        logger.error(f"Error updating to-do {pk} for user {request.user}: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         todo = get_object_or_404(ToDo, pk=pk, user=request.user)
         todo.delete()
+        logger.info(f"To-Do {pk} deleted successfully for user {request.user}")
         return Response({"message": "To-Do item deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
     
 
@@ -347,9 +354,14 @@ class ToDoDetailHTMLView(View):
         description = request.POST.get('description')
         completed = request.POST.get('completed') == 'true'
 
+        if not title:
+            messages.error(request, "Title cannot be empty.")
+            return render(request, 'support_app/todo_detail.html', {'todo': todo})
+
         todo.title = title
         todo.description = description
         todo.completed = completed
         todo.save()
 
+        messages.success(request, "To-Do updated successfully.")
         return redirect('todo_list')

@@ -7,9 +7,11 @@ User = get_user_model()
 
 class AlertsAppTestCase(TestCase):
     def setUp(self):
+        # Create a test user
         self.user = User.objects.create_user(username='testuser', password='password123')
         self.client.login(username='testuser', password='password123')
 
+        # Create a test notification
         self.notification = Notification.objects.create(
             user=self.user,
             notification_type="in_app",
@@ -17,13 +19,8 @@ class AlertsAppTestCase(TestCase):
             is_read=False,
         )
 
-        self.notification_preference = NotificationPreference.objects.create(
-            user=self.user,
-            email_enabled=True,
-            sms_enabled=False,
-            in_app_enabled=True,
-            push_enabled=False,
-        )
+        # The NotificationPreference is now automatically created by the signal
+        self.notification_preference = self.user.notification_preferences
 
     # Test: List Notifications
     def test_notification_list(self):

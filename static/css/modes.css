@@ -176,3 +176,13 @@ body.dark .card-body {
     background-color: #3a3b3c;
     color: #ccc;
 }
+
+.modal-dark-mode {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+body.dark .modal-dark-mode {
+    background-color: #6c757d;
+    color: #ffffff;
+}

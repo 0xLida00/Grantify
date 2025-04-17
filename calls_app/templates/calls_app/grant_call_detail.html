@@ -9,14 +9,12 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Grant Details</h5>
-            <p><strong>Description:</strong> {{ grant_call.description }}</p>
+            <p><strong>Description:</strong> {{ grant_call.description|linebreaksbr }}</p>
             <p><strong>Deadline:</strong> {{ grant_call.deadline }}</p>
             <p><strong>Eligibility:</strong></p>
-            <ol>
                 {% for criterion in grant_call.eligibility.splitlines %}
                 <li>{{ criterion }}</li>
                 {% endfor %}
-            </ol>
             <p><strong>Budget:</strong> ${{ grant_call.budget }}</p>
             <p><strong>Status:</strong> 
                 <span class="badge 
@@ -34,20 +32,11 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Questions</h5>
-            <ol>
                 {% for question in grant_call.questions.all %}
                 <li class="mb-4">
                     <strong>{{ question.question_text }}</strong>
-                    {% if question.question_type == "multiple_choice" %}
-                    <ul class="mt-2">
-                        {% for choice in question.get_choices %}
-                        <li>{{ choice }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
                 </li>
                 {% endfor %}
-            </ol>
         </div>
     </div>
     {% else %}
@@ -67,5 +56,6 @@
         {% endif %}
         <a href="{% url 'grant_call_list' %}" class="btn btn-secondary mx-2">Back</a>
     </div>
+    <br>
 </div>
 {% endblock %}

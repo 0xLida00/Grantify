@@ -48,9 +48,9 @@
         <tbody>
             {% for proposal in page_obj %}
             <tr>
-                <td>{{ proposal.title }}</td>
+                <td>{{ proposal.title|slice:":30" }}{% if proposal.title|length > 30 %}...{% endif %}</td>
                 <td>{{ proposal.applicant.username }}</td>
-                <td>{{ proposal.grant_call }}</td>
+                <td>{{ proposal.grant_call.title|slice:":30" }}{% if proposal.grant_call.title|length > 30 %}...{% endif %}</td>
                 <td>
                     <span class="badge 
                         {% if proposal.status == 'draft' %}badge-secondary

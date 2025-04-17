@@ -57,23 +57,6 @@
                         </div>
                         {% endif %}
                     </div>
-    
-                    <!-- Choices Section -->
-                    <div class="choices-section" style="display: none;">
-                        <h5>Choices</h5>
-                        <div class="form-group">
-                            {{ question_form.choices_text.label_tag }}
-                            {{ question_form.choices_text }}
-                            {% if question_form.choices_text.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in question_form.choices_text.errors %}
-                                <small>{{ error }}</small><br>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <small class="form-text text-muted">Enter one choice per line (only for multiple-choice questions).</small>
-                    </div>
                 </div>
             </div>
             {% endfor %}

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import GrantCall, GrantQuestion, GrantChoice, GrantResponse
+from .models import GrantCall, GrantQuestion, GrantResponse
 
 @admin.register(GrantCall)
 class GrantCallAdmin(admin.ModelAdmin):
@@ -16,12 +16,6 @@ class GrantQuestionAdmin(admin.ModelAdmin):
     list_filter = ('question_type', 'grant_call')
     search_fields = ('question_text', 'grant_call__title')
     ordering = ('grant_call',)
-
-@admin.register(GrantChoice)
-class GrantChoiceAdmin(admin.ModelAdmin):
-    list_display = ('choice_text', 'question')
-    search_fields = ('choice_text', 'question__question_text')
-    ordering = ('question',)
 
 @admin.register(GrantResponse)
 class GrantResponseAdmin(admin.ModelAdmin):

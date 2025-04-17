@@ -26,29 +26,14 @@ class GrantCall(models.Model):
 class GrantQuestion(models.Model):
     QUESTION_TYPE_CHOICES = (
         ('open', 'Open-Ended'),
-        ('multiple_choice', 'Multiple Choice'),
         ('file_upload', 'File Upload'),
     )
     grant_call = models.ForeignKey(GrantCall, on_delete=models.CASCADE, related_name="questions")
     question_text = models.CharField(max_length=255)
     question_type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='open')
-    choices_text = models.TextField(blank=True, null=True, help_text="Enter one choice per line (only for multiple-choice questions).")
-
-    def get_choices(self):
-        if self.choices_text:
-            return [choice.strip() for choice in self.choices_text.splitlines() if choice.strip()]
-        return []
 
     def __str__(self):
         return self.question_text
-
-
-class GrantChoice(models.Model):
-    question = models.ForeignKey(GrantQuestion, on_delete=models.CASCADE, related_name="choices")
-    choice_text = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.choice_text
     
 
 class GrantResponse(models.Model):

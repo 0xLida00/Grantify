@@ -2,21 +2,23 @@
 {% load static %}
 
 {% block content %}
-<h1>Feedback Detail</h1>
-<div class="card">
-    <div class="card-header">
-        <h5>Proposal: {{ evaluation.proposal.title }}</h5>
-        <p><strong>Evaluator:</strong> {{ evaluation.evaluator.username }}</p>
-        <p><strong>Score:</strong> {{ evaluation.score }}</p>
-        <p><strong>Status:</strong> {{ evaluation.get_status_display }}</p>
+<div class="container mt-5">
+    <h1 class="mb-4">Feedback Detail</h1>
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-3">Proposal: {{ evaluation.proposal.title }}</h5>
+            <p><strong>Evaluator:</strong> {{ evaluation.evaluator.username }}</p>
+            <p><strong>Score:</strong> {{ evaluation.score }}</p>
+            <p><strong>Status:</strong> {{ evaluation.get_status_display }}</p>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Feedback</h5>
+            <p class="card-text">{{ evaluation.feedback }}</p>
+        </div>
+        <div class="card-footer text-muted">
+            <p><strong>Evaluated At:</strong> {{ evaluation.evaluated_at }}</p>
+        </div>
     </div>
-    <div class="card-body">
-        <h5 class="card-title">Feedback</h5>
-        <p class="card-text">{{ evaluation.feedback }}</p>
-    </div>
-    <div class="card-footer text-muted">
-        <p><strong>Evaluated At:</strong> {{ evaluation.evaluated_at }}</p>
-    </div>
+    <a href="{% url 'monitor_evaluations' %}" class="btn btn-secondary mt-4">Back to Evaluations</a>
 </div>
-<a href="{% url 'monitor_evaluations' %}" class="btn btn-secondary mt-3">Back to Evaluations</a>
 {% endblock %}

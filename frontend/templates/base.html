@@ -127,6 +127,12 @@
                                     <i class='bx bx-heart icon'></i>
                                     <span class="text nav-text">Favorite Calls</span>
                                 </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'proposals_app:proposal_list' %}">
+                                    <i class='bx bx-file icon'></i>
+                                    <span class="text nav-text">My Proposals</span>
+                                </a>
                             </li>                                
                         {% else %}
                             <li>
@@ -374,6 +380,7 @@
     <script src="{% static 'js/dashboard.js' %}"></script>
     <script src="{% static 'js/generate_report.js' %}"></script>
     <script src="{% static 'js/apply.js' %}"></script>
+    <script src="{% static 'js/faq_modal.js' %}"></script>
 </body>
 </html>
             

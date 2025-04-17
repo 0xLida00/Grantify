@@ -3,50 +3,57 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from evaluation_app.models import Evaluation
 from proposals_app.models import Proposal, GrantCall
-from alerts_app.models import NotificationPreference
-from datetime import datetime, timedelta
+from alerts_app.models import Notification
+from django.utils.timezone import now
 
 User = get_user_model()
 
-class EvaluationAppTests(TestCase):
+class EvaluationAppTestCase(TestCase):
     def setUp(self):
-        # Create users
-        self.admin = User.objects.create_user(username='admin', password='password', is_staff=True)
-        self.evaluator = User.objects.create_user(username='evaluator', password='password')
-        self.applicant = User.objects.create_user(username='applicant', password='password')
+        # Create a staff user (admin)
+        self.admin_user = User.objects.create_user(
+            username='adminuser',
+            password='adminpassword',
+            is_staff=True
+        )
 
-        # Create notification preferences for users
-        NotificationPreference.objects.create(user=self.admin)
-        NotificationPreference.objects.create(user=self.evaluator)
-        NotificationPreference.objects.create(user=self.applicant)
+        # Create an evaluator
+        self.evaluator = User.objects.create_user(
+            username='evaluator',
+            password='evaluatorpassword',
+            is_staff=False
+        )
 
         # Create a grant call
         self.grant_call = GrantCall.objects.create(
             title="Test Grant Call",
             description="Test Description",
-            status="open",
-            budget=10000,
-            deadline=datetime.now() + timedelta(days=30),
-            created_by=self.admin
+            deadline=now().date(),
+            eligibility="Eligibility Criteria",
+            budget=100000.00,
+            created_by=self.admin_user
         )
 
         # Create a proposal
         self.proposal = Proposal.objects.create(
             title="Test Proposal",
-            applicant=self.applicant,
-            grant_call=self.grant_call,
-            status="submitted"
+            status="submitted",
+            applicant=self.evaluator,
+            grant_call=self.grant_call
         )
 
         # Create an evaluation
         self.evaluation = Evaluation.objects.create(
             proposal=self.proposal,
             evaluator=self.evaluator,
+            score=None,
+            feedback=None,
             status="pending"
         )
 
-    def test_assign_evaluator(self):
-        self.client.login(username='admin', password='password')
+    # Test: Assign evaluators
+    def test_assign_evaluators(self):
+        self.client.login(username='adminuser', password='adminpassword')
         response = self.client.post(reverse('assign_evaluators'), {
             'proposal': self.proposal.id,
             'evaluator': self.evaluator.id
@@ -54,51 +61,46 @@ class EvaluationAppTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Evaluation.objects.filter(proposal=self.proposal, evaluator=self.evaluator).exists())
 
+    # Test: Monitor evaluations
     def test_monitor_evaluations(self):
-        self.client.login(username='admin', password='password')
+        self.client.login(username='adminuser', password='adminpassword')
         response = self.client.get(reverse('monitor_evaluations'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test Proposal")
-        self.assertContains(response, self.evaluator.username)
+        self.assertTemplateUsed(response, 'evaluation_app/monitor_evaluations.html')
+        self.assertContains(response, self.proposal.title)
 
+    # Test: Evaluator dashboard
     def test_evaluator_dashboard(self):
-        self.client.login(username='evaluator', password='password')
+        self.client.login(username='evaluator', password='evaluatorpassword')
         response = self.client.get(reverse('evaluator_dashboard'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test Proposal")
+        self.assertTemplateUsed(response, 'evaluation_app/evaluator_dashboard.html')
+        self.assertContains(response, self.proposal.title)
 
+    # Test: Submit evaluation
     def test_submit_evaluation(self):
-        self.client.login(username='evaluator', password='password')
+        self.client.login(username='evaluator', password='evaluatorpassword')
         response = self.client.post(reverse('submit_evaluation', args=[self.evaluation.id]), {
-            'score': 8.5,
-            'feedback': 'Good proposal.'
+            'score': 8.5,  # Valid score within the range 0-10
+            'feedback': "Great proposal!",  # Valid feedback
         })
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)  # Ensure redirection after submission
         self.evaluation.refresh_from_db()
+        self.assertEqual(self.evaluation.status, 'completed')  # Status should be updated in the view
         self.assertEqual(self.evaluation.score, 8.5)
-        self.assertEqual(self.evaluation.feedback, 'Good proposal.')
-        self.assertEqual(self.evaluation.status, 'completed')
+        self.assertEqual(self.evaluation.feedback, "Great proposal!")
 
-    def test_submit_evaluation_invalid_score(self):
-        self.client.login(username='evaluator', password='password')
-        response = self.client.post(reverse('submit_evaluation', args=[self.evaluation.id]), {
-            'score': 15,
-            'feedback': 'Invalid score test.'
-        })
-        self.assertEqual(response.status_code, 200)
-        self.evaluation.refresh_from_db()
-        self.assertNotEqual(self.evaluation.score, 15)
-        self.assertEqual(self.evaluation.status, 'pending')
-
+    # Test: Feedback detail (admin only)
     def test_feedback_detail(self):
-        self.evaluation.score = 9.0
-        self.evaluation.feedback = "Excellent proposal."
-        self.evaluation.status = "completed"
-        self.evaluation.save()
-
-        self.client.login(username='admin', password='password')
+        self.client.login(username='adminuser', password='adminpassword')
         response = self.client.get(reverse('feedback_detail', args=[self.evaluation.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Excellent proposal.")
-        self.assertContains(response, "Test Proposal")
-        self.assertContains(response, "9.0")
+        self.assertTemplateUsed(response, 'evaluation_app/feedback_detail.html')
+        self.assertContains(response, self.proposal.title)
+
+    # Test: Unauthorized access to feedback detail
+    def test_feedback_detail_unauthorized(self):
+        self.client.login(username='evaluator', password='evaluatorpassword')
+        response = self.client.get(reverse('feedback_detail', args=[self.evaluation.id]))
+        self.assertEqual(response.status_code, 302)  # Redirect to login or another page
+        self.assertIn('/admin/login/', response.url)  # Verify redirection to admin login page

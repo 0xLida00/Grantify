@@ -40,6 +40,56 @@ Grantify is a full-stack web application designed to streamline the grant applic
 
 5. Access the app at `http://127.0.0.1:8000`.
 
+### Deployment on Render
+1. **Create a Render Account**:
+   - Sign up at [Render](https://render.com/) if you don’t already have an account.
+
+2. **Create a New Web Service**:
+   - Link your GitHub repository to Render.
+   - Select the branch you want to deploy.
+
+3. **Set Environment Variables**:
+   - Go to the **Environment** tab in your Render service.
+   - Add the following environment variables:
+     ```
+     SECRET_KEY=your-production-secret-key
+     DATABASE_URL=your-production-database-url
+     ```
+
+4. **Update `settings.py`**:
+   - Ensure the following is already configured in `settings.py`:
+     ```python
+     import os
+
+     DEBUG = False
+     ALLOWED_HOSTS = ['your-render-app-url']  # Replace with your Render app URL
+     ```
+
+5. **Install Gunicorn**:
+   - Ensure `gunicorn` is listed in your `requirements.txt` file:
+     ```
+     gunicorn
+     ```
+
+6. **Start Command**:
+   - Make sure to add the below to the start command:
+     ```
+     gunicorn Grantify_Project.wsgi:application
+     ```
+
+7. **Deploy**:
+   - Deploy the app on Render. Render will automatically detect the Python environment and install dependencies.
+
+8. **Access Your App**:
+   - Once deployed, access your app at the Render-provided URL.
+
+---
+
+### Notes
+- **Environment Variables**: Keep sensitive values like `SECRET_KEY` and `DATABASE_URL` secure in the Render environment variables.
+- **Static and Media Files**: Cloudinary is used for media file storage. Ensure the `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` are correctly configured in `.env`.
+
+
 ## Usage
 1. Register or log in to your account.
 2. Browse available grants or create new grant opportunities.

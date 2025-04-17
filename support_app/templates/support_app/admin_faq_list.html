@@ -33,7 +33,7 @@
                 </td>
                 <td>
                     <a href="{% url 'admin_faq_edit' faq.id %}" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="{% url 'admin_faq_delete' faq.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="{{ faq.id }}" data-question="{{ faq.question }}">Delete</button>
                 </td>
             </tr>
             {% empty %}
@@ -43,6 +43,27 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-dark-mode">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the FAQ: "<span id="faqQuestion"></span>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Pagination Controls -->
     <div class="d-flex justify-content-center">

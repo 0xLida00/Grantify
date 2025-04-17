@@ -11,8 +11,8 @@ from django.views.generic import ListView, CreateView, DetailView, DeleteView, U
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden, JsonResponse
 from alerts_app.models import Notification
-from .models import GrantCall, GrantQuestion, GrantChoice, GrantResponse
-from .forms import GrantCallForm, GrantQuestionForm, GrantChoiceForm, GrantQuestionFormSet, ApplicationForm, GrantChoiceFormSet
+from .models import GrantCall, GrantQuestion, GrantResponse
+from .forms import GrantCallForm, GrantQuestionForm, GrantQuestionFormSet, ApplicationForm
 from audit_app.models import LogEntry
 from proposals_app.models import Proposal
 
@@ -89,22 +89,13 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
             context["question_formset"] = GrantQuestionFormSet(self.request.POST, instance=self.object)
-            context["choice_formsets"] = [
-                GrantChoiceFormSet(self.request.POST, instance=question_form.instance, prefix=f"choices_{index}")
-                for index, question_form in enumerate(context["question_formset"])
-            ]
         else:
             context["question_formset"] = GrantQuestionFormSet(instance=self.object)
-            context["choice_formsets"] = [
-                GrantChoiceFormSet(instance=question_form.instance, prefix=f"choices_{index}")
-                for index, question_form in enumerate(context["question_formset"])
-            ]
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
         question_formset = context["question_formset"]
-        choice_formsets = context["choice_formsets"]
 
         if form.is_valid() and question_formset.is_valid():
             grant_call = form.save(commit=False)
@@ -112,13 +103,7 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
             grant_call.save()
 
             question_formset.instance = grant_call
-            questions = question_formset.save()
-
-            for question, choice_formset in zip(questions, choice_formsets):
-                if question.question_type == "multiple_choice":
-                    choice_formset.instance = question
-                    if choice_formset.is_valid():
-                        choice_formset.save()
+            question_formset.save()
 
             LogEntry.objects.create(
                 user=self.request.user,
@@ -138,15 +123,8 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
 
             messages.success(self.request, "Grant call created successfully!")
             return redirect(self.success_url)
-        else:
-            messages.error(self.request, "There was an error creating the grant call. Please check the form.")
-            return self.form_invalid(form)
-        
-    def form_invalid(self, form):
-        context = self.get_context_data()
-        question_formset = context["question_formset"]
-        return super().form_invalid(form)
 
+        return self.form_invalid(form)
 
 # Grant Call Detail View
 class GrantCallDetailView(DetailView):
@@ -157,9 +135,7 @@ class GrantCallDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         grant_call = self.get_object()
-
-        context["questions"] = grant_call.questions.prefetch_related("choices").all()
-
+        context["questions"] = grant_call.questions.all()
         return context
 
 

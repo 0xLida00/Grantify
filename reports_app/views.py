@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Report
 from django.utils.timezone import now, timedelta
@@ -48,7 +48,7 @@ def report_list(request):
 # View to display a detailed report
 @staff_member_required
 def report_detail(request, pk):
-    report = Report.objects.get(pk=pk)
+    report = get_object_or_404(Report, pk=pk)
     return render(request, 'reports_app/report_detail.html', {'report': report})
 
 

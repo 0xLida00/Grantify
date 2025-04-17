@@ -12,11 +12,10 @@
             <p><strong>Description:</strong> {{ grant_call.description }}</p>
             <p><strong>Deadline:</strong> {{ grant_call.deadline }}</p>
             <p><strong>Eligibility:</strong></p>
-            <ul>
                 {% for criterion in grant_call.eligibility.splitlines %}
                 <li>{{ criterion }}</li>
                 {% endfor %}
-            </ul>
+            <br>
             <p><strong>Budget:</strong> ${{ grant_call.budget }}</p>
             <p><strong>Status:</strong> 
                 <span class="badge 
@@ -37,18 +36,7 @@
             {% for field in form %}
             <div class="mb-4">
                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {% if field.widget.input_type == "checkbox" %}
-                <div class="list-group">
-                    {% for subwidget in field %}
-                    <div class="list-group-item">
-                        <div class="form-check">
-                            {{ subwidget.tag|add:" disabled" }}
-                            <label class="form-check-label" for="{{ subwidget.id }}">{{ subwidget.choice_label }}</label>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% elif field.widget.input_type == "file" %}
+                {% if field.widget.input_type == "file" %}
                 <div class="form-control">
                     {% if field.value %}
                         <a href="{{ field.value.url }}" target="_blank">Download File</a>

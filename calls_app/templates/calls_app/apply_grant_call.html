@@ -9,14 +9,13 @@
     <div class="card mb-4 shadow-sm">
         <div class="card-body">
             <h5 class="card-title">Grant Details</h5>
-            <p><strong>Description:</strong> {{ grant_call.description }}</p>
+            <p><strong>Description:</strong> {{ grant_call.description|linebreaksbr }}</p>
             <p><strong>Deadline:</strong> {{ grant_call.deadline }}</p>
             <p><strong>Eligibility:</strong></p>
-            <ul>
                 {% for criterion in grant_call.eligibility.splitlines %}
                 <li>{{ criterion }}</li>
                 {% endfor %}
-            </ul>
+            <br>
             <p><strong>Budget:</strong> ${{ grant_call.budget }}</p>
             <p><strong>Status:</strong> 
                 <span class="badge 
@@ -52,18 +51,7 @@
                             </td>
                             <!-- Answer -->
                             <td>
-                                {% if field.widget.input_type == "checkbox" %}
-                                <div class="choices-wrapper">
-                                    <ul class="list-unstyled">
-                                        {% for choice_value, choice_label in field.field.choices %}
-                                        <li class="mb-2 d-flex align-items-center">
-                                            <input type="checkbox" name="{{ field.html_name }}" value="{{ choice_value }}" id="{{ field.id_for_label }}_{{ forloop.counter }}" class="custom-checkbox">
-                                            <label class="custom-label ms-2" for="{{ field.id_for_label }}_{{ forloop.counter }}">{{ choice_label }}</label>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                {% elif field.widget.input_type == "file" %}
+                                {% if field.widget.input_type == "file" %}
                                 <!-- File Upload -->
                                 <div class="form-control">
                                     {{ field }}
