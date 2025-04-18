@@ -4,6 +4,9 @@ from django.core.files.storage import default_storage
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from PIL import Image, UnidentifiedImageError
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
@@ -35,24 +38,26 @@ class CustomUser(AbstractUser):
 
     def get_profile_picture_url(self):
         if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
-            return self.profile_picture.url
+            return self.profile_picture.url + "?c_fill,g_face,h_300,w_300"
         return f"{settings.MEDIA_URL}profile_pics/default.png"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
+        if self.profile_picture:
             try:
-                img_path = self.profile_picture.path
-                with Image.open(img_path) as img:
-                    if img.height > 300 or img.width > 300:
-                        img.thumbnail((300, 300))
-                        img.save(img_path)
+                if isinstance(self.profile_picture.storage, default_storage.__class__):
+                    if self.profile_picture.storage.exists(self.profile_picture.name):
+                        img_path = self.profile_picture.path
+                        with Image.open(img_path) as img:
+                            if img.height > 300 or img.width > 300:
+                                img.thumbnail((300, 300))
+                                img.save(img_path)
             except FileNotFoundError:
-                print(f"Profile picture file not found: {self.profile_picture.name}")
+                logger.error(f"Profile picture file not found: {self.profile_picture.name}")
             except UnidentifiedImageError:
-                print(f"Invalid image file: {self.profile_picture.name}")
+                logger.error(f"Invalid image file: {self.profile_picture.name}")
             except OSError as e:
-                print(f"OS error while processing profile picture: {e}")
+                logger.error(f"OS error while processing profile picture: {e}")
 
 
 class MyModel(models.Model):

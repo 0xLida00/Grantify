@@ -205,7 +205,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 IS_PRODUCTION = os.getenv("DJANGO_PRODUCTION", "False") == "True"
 
 if IS_PRODUCTION:
-    # Use Cloudinary for production
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
         'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
@@ -213,7 +212,6 @@ if IS_PRODUCTION:
     }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
-    # Use local file system for development and testing
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 
