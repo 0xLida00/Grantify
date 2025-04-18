@@ -11,7 +11,7 @@
             <tr>
                 <th>User</th>
                 <th>Message</th>
-                <th>Created At</th>
+                <th class="d-none d-md-table-cell">Created At</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -20,7 +20,7 @@
             <tr>
                 <td>{{ feedback.user.username }}</td>
                 <td>{{ feedback.message|slice:":15" }}{% if feedback.message|length > 15 %}...{% endif %}</td>
-                <td>{{ feedback.created_at }}</td>
+                <td class="d-none d-md-table-cell">{{ feedback.created_at }}</td>
                 <td>
                     <a href="{% url 'support_feedback_detail' feedback.id %}" class="btn btn-info btn-sm">View</a>
                 </td>
@@ -38,7 +38,7 @@
         <nav>
             <ul class="pagination">
                 {% if page_obj.has_previous %}
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page=1">First</a>
                 </li>
                 <li class="page-item">
@@ -62,7 +62,7 @@
                 <li class="page-item">
                     <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
                 </li>
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
                 </li>
                 {% endif %}

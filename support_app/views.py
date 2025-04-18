@@ -326,11 +326,12 @@ class ToDoDetailView(APIView):
         serializer = ToDoSerializer(todo)
         return Response(serializer.data)
 
-    def put(self, request, pk):
+    def patch(self, request, pk):
         todo = get_object_or_404(ToDo, pk=pk, user=request.user)
         serializer = ToDoSerializer(todo, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            logger.info(f"To-Do {pk} updated successfully for user {request.user}")
             return Response(serializer.data)
         logger.error(f"Error updating to-do {pk} for user {request.user}: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

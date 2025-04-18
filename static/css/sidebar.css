@@ -31,6 +31,10 @@ body {
   transition: var(--tran-05);
 }
 
+body.hidden {
+  visibility: hidden;
+}
+
 ::selection {
   background-color: var(--primary-color);
   color: #fff;
@@ -54,7 +58,6 @@ body.dark {
   width: 250px;
   padding: 10px 14px;
   background: var(--sidebar-color);
-  transition: var(--tran-05);
   z-index: 100;
 }
 
@@ -168,7 +171,6 @@ body.dark .sidebar header .toggle {
 
 body.dark {
   background-color: #18191a;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .sidebar.close .toggle {

@@ -113,7 +113,6 @@ def profile(request, username):
                 source="User",
             )
 
-            # Create a notification
             Notification.objects.create(
                 user=request.user,
                 notification_type="in_app",

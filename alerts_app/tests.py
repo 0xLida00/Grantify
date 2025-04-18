@@ -19,7 +19,6 @@ class AlertsAppTestCase(TestCase):
             is_read=False,
         )
 
-        # The NotificationPreference is now automatically created by the signal
         self.notification_preference = self.user.notification_preferences
 
     # Test: List Notifications

@@ -12,7 +12,7 @@
     <table class="table">
         <thead class="thead-dark">
             <tr>
-                <th>ID</th>
+                <th class="d-none d-md-table-cell">ID</th>
                 <th>Question</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -21,7 +21,7 @@
         <tbody>
             {% for faq in page_obj %}
             <tr>
-                <td>{{ faq.id }}</td>
+                <td class="d-none d-md-table-cell">{{ faq.id }}</td>
                 <td>{{ faq.question }}</td>
                 <td>
                     <span class="badge 
@@ -33,7 +33,7 @@
                 </td>
                 <td>
                     <a href="{% url 'admin_faq_edit' faq.id %}" class="btn btn-warning btn-sm">Edit</a>
-                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="{{ faq.id }}" data-question="{{ faq.question }}">Delete</button>
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-faq-url="{% url 'admin_faq_delete' faq.id %}" data-question="{{ faq.question }}">Delete</button>
                 </td>
             </tr>
             {% empty %}
@@ -58,8 +58,11 @@
                     Are you sure you want to delete the FAQ: "<span id="faqQuestion"></span>"?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
+                    <form id="deleteFaqForm" method="post">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -70,7 +73,7 @@
         <nav>
             <ul class="pagination">
                 {% if page_obj.has_previous %}
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page=1">First</a>
                 </li>
                 <li class="page-item">
@@ -94,7 +97,7 @@
                 <li class="page-item">
                     <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
                 </li>
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
                 </li>
                 {% endif %}

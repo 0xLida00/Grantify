@@ -81,12 +81,12 @@ class EvaluationAppTestCase(TestCase):
     def test_submit_evaluation(self):
         self.client.login(username='evaluator', password='evaluatorpassword')
         response = self.client.post(reverse('submit_evaluation', args=[self.evaluation.id]), {
-            'score': 8.5,  # Valid score within the range 0-10
-            'feedback': "Great proposal!",  # Valid feedback
+            'score': 8.5,
+            'feedback': "Great proposal!",
         })
-        self.assertEqual(response.status_code, 302)  # Ensure redirection after submission
+        self.assertEqual(response.status_code, 302)
         self.evaluation.refresh_from_db()
-        self.assertEqual(self.evaluation.status, 'completed')  # Status should be updated in the view
+        self.assertEqual(self.evaluation.status, 'completed')
         self.assertEqual(self.evaluation.score, 8.5)
         self.assertEqual(self.evaluation.feedback, "Great proposal!")
 
@@ -102,5 +102,5 @@ class EvaluationAppTestCase(TestCase):
     def test_feedback_detail_unauthorized(self):
         self.client.login(username='evaluator', password='evaluatorpassword')
         response = self.client.get(reverse('feedback_detail', args=[self.evaluation.id]))
-        self.assertEqual(response.status_code, 302)  # Redirect to login or another page
-        self.assertIn('/admin/login/', response.url)  # Verify redirection to admin login page
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/admin/login/', response.url)

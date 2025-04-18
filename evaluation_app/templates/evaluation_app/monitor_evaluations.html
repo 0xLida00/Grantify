@@ -37,18 +37,18 @@
         <thead class="thead-dark">
             <tr>
                 <th>Proposal</th>
-                <th>Evaluator</th>
+                <th class="d-none d-md-table-cell">Evaluator</th>
                 <th>Score</th>
                 <th>Status</th>
-                <th>Feedback</th>
-                <th>Evaluated At</th>
+                <th class="d-none d-md-table-cell">Feedback</th>
+                <th class="d-none d-md-table-cell">Evaluated At</th>
             </tr>
         </thead>
         <tbody>
             {% for evaluation in evaluations %}
             <tr>
                 <td>{{ evaluation.proposal.title }}</td>
-                <td>{{ evaluation.evaluator.username }}</td>
+                <td class="d-none d-md-table-cell">{{ evaluation.evaluator.username }}</td>
                 <td>{{ evaluation.score }}</td>
                 <td>
                     <span class="badge 
@@ -59,7 +59,7 @@
                         {{ evaluation.get_status_display }}
                     </span>
                 </td>
-                <td>
+                <td class="d-none d-md-table-cell">
                     <div class="d-flex justify-content-between">
                         <span>
                             {% if evaluation.feedback %}
@@ -71,7 +71,7 @@
                         <a href="{% url 'feedback_detail' evaluation.pk %}" class="btn btn-info btn-sm">View</a>
                     </div>
                 </td>
-                <td>{{ evaluation.evaluated_at }}</td>
+                <td class="d-none d-md-table-cell">{{ evaluation.evaluated_at }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -86,7 +86,7 @@
         <nav>
             <ul class="pagination">
                 {% if evaluations.has_previous %}
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">First</a>
                 </li>
                 <li class="page-item">
@@ -110,7 +110,7 @@
                 <li class="page-item">
                     <a class="page-link" href="?page={{ evaluations.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Next</a>
                 </li>
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page={{ evaluations.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if evaluator_filter %}&evaluator={{ evaluator_filter }}{% endif %}">Last</a>
                 </li>
                 {% endif %}

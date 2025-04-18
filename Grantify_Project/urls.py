@@ -34,6 +34,3 @@ urlpatterns = [
     path('audit/', include('audit_app.urls')),
     path('search/', include('frontend.urls')), 
 ]
-
-if not settings.IS_PRODUCTION:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

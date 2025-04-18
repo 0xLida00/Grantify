@@ -58,39 +58,39 @@ class ReportsAppTests(TestCase):
             generated_at=now() - timedelta(days=1)
         )
 
+    # Dashboard_access_control: Tests access control for the dashboard.
     def test_dashboard_access_control(self):
-        # Non-staff user should be redirected to the admin login page
         self.client.login(username='regularuser', password='password123')
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 302)
         self.assertIn('/admin/login/', response.url)
 
-        # Staff user should have access
         self.client.login(username='staffuser', password='password123')
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
 
+    # Dashboard_statistics: Tests the statistics displayed on the dashboard.
     def test_dashboard_statistics(self):
         self.client.login(username='staffuser', password='password123')
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, "2")  # Total proposals
-        self.assertContains(response, "2")  # Total evaluations
-        self.assertContains(response, "87.5")  # Average score
-        self.assertContains(response, "1")  # Accepted proposals
-        self.assertContains(response, "1")  # Rejected proposals
+        self.assertContains(response, "2")
+        self.assertContains(response, "2")
+        self.assertContains(response, "87.5")
+        self.assertContains(response, "1")
+        self.assertContains(response, "1")
 
+    # Report_list_access_control: Tests access control for the report list.
     def test_report_list_access_control(self):
-        # Non-staff user should be redirected to the admin login page
         self.client.login(username='regularuser', password='password123')
         response = self.client.get(reverse('report_list'))
         self.assertEqual(response.status_code, 302)
         self.assertIn('/admin/login/', response.url)
 
-        # Staff user should have access
         self.client.login(username='staffuser', password='password123')
         response = self.client.get(reverse('report_list'))
         self.assertEqual(response.status_code, 200)
 
+    # Report_list_pagination: Tests pagination for the report list.
     def test_report_list_pagination(self):
         self.client.login(username='staffuser', password='password123')
         response = self.client.get(reverse('report_list'))
@@ -98,24 +98,25 @@ class ReportsAppTests(TestCase):
         self.assertContains(response, self.report1.generated_by.username)
         self.assertContains(response, self.report1.generated_at.strftime('%Y-%m-%d'))
 
+    # Report_detail_access_control: Tests access control for report details.
     def test_report_detail_access_control(self):
-        # Non-staff user should be redirected to the admin login page
         self.client.login(username='regularuser', password='password123')
         response = self.client.get(reverse('report_detail', args=[self.report1.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertIn('/admin/login/', response.url)
 
-        # Staff user should have access
         self.client.login(username='staffuser', password='password123')
         response = self.client.get(reverse('report_detail', args=[self.report1.pk]))
         self.assertEqual(response.status_code, 200)
 
+    # Report_detail_correct_display: Tests the correct display of report details.
     def test_report_detail_correct_display(self):
         self.client.login(username='staffuser', password='password123')
         response = self.client.get(reverse('report_detail', args=[self.report1.pk]))
         self.assertContains(response, self.report1.report_data)
         self.assertContains(response, self.report1.generated_by.username)
 
+    # Report_detail_non_existent: Tests the behavior for non-existent report details.
     def test_report_detail_non_existent(self):
         self.client.login(username='staffuser', password='password123')
         response = self.client.get(reverse('report_detail', args=[999]))

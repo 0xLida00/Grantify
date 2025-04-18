@@ -346,7 +346,7 @@ class ToDoAPITest(APITestCase):
         data = {
             "completed": True,
         }
-        response = self.client.put(f"/api/todos/{self.todo.id}/", data, format="json")
+        response = self.client.patch(f"/api/todos/{self.todo.id}/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.todo.refresh_from_db()
         self.assertTrue(self.todo.completed)

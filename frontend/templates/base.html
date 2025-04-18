@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="{% static 'css/support.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="hidden">
     <div class="container">
         <br>
         <div class="d-flex align-items-center justify-content-between">
@@ -41,7 +41,7 @@
                     </div>
                     <!-- Notifications Dropdown -->
                     {% if user.is_authenticated %}
-                    <li class="nav-item dropdown position-relative d-flex align-items-center ml-4">
+                    <li class="nav-item dropdown position-relative d-none d-md-flex ml-4">
                         <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown"
                         role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-bell bell-icon"></i>
@@ -315,7 +315,6 @@
     </footer>
     </section>
     
-
     <!-- Floating Support Icon -->
     <div id="support-icon" class="support-icon">
     <i class="fas fa-envelope"></i>
@@ -382,5 +381,4 @@
     <script src="{% static 'js/apply.js' %}"></script>
     <script src="{% static 'js/faq_modal.js' %}"></script>
 </body>
-</html>
-            
+</html>      

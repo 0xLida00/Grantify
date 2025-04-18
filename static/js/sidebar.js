@@ -5,10 +5,11 @@ const body = document.querySelector('body'),
   modeSwitch = body.querySelector(".toggle-switch"),
   modeText = body.querySelector(".mode-text");
 
+body.classList.add('hidden');
+
 // Get the saved dark mode state from localStorage
 let darkMode = localStorage.getItem('darkMode');
 
-// Apply dark mode if it was enabled previously
 if (darkMode === 'enabled') {
   body.classList.add('dark');
   modeText.innerText = "Light mode";
@@ -19,21 +20,22 @@ if (darkMode === 'enabled') {
   modeSwitch.classList.remove('active');
 }
 
-// Get the saved sidebar state from localStorage
 let sidebarState = localStorage.getItem('sidebarState');
 
-// Apply the saved sidebar state
 if (sidebarState === 'open') {
   sidebar.classList.remove('close');
 } else {
   sidebar.classList.add('close');
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  body.classList.remove('hidden');
+});
+
 // Toggle sidebar visibility and save the state
 toggle.addEventListener("click", () => {
   sidebar.classList.toggle("close");
 
-  // Save the sidebar state to localStorage
   if (sidebar.classList.contains('close')) {
     localStorage.setItem('sidebarState', 'closed');
   } else {
@@ -47,7 +49,6 @@ searchBtn.addEventListener("click", () => {
   localStorage.setItem('sidebarState', 'open');
 });
 
-// Toggle dark mode and update mode text on click
 modeSwitch.addEventListener("click", () => {
   body.classList.toggle('dark');
 

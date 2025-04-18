@@ -26,9 +26,9 @@
                         {{ ticket.id }}
                     </a>
                 </td>
-                <td>{{ ticket.user.username }}</td>
-                <td>{{ ticket.subject }}</td>
-                <td>
+                <td class="d-none d-md-table-cell">{{ ticket.user.username }}</td>
+                <td class="d-none d-md-table-cell">{{ ticket.subject }}</td>
+                <td class="d-none d-md-table-cell">
                     {{ ticket.description|slice:":25" }}{% if ticket.description|length > 25 %}...{% endif %}
                 </td>
                 <td>
@@ -41,7 +41,7 @@
                         {{ ticket.status|capfirst }}
                     </span>
                 </td>
-                <td>
+                <td class="d-none d-md-table-cell">
                     {{ ticket.response|default:"No response yet"|slice:":50" }}{% if ticket.response|length > 50 %}...{% endif %}
                 </td>
             </tr>

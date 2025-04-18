@@ -44,32 +44,37 @@ document.addEventListener('DOMContentLoaded', function () {
                     todoList.appendChild(li);
                 });
 
-                document.querySelectorAll('.toggle-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        toggleTodo(this.dataset.id, this.dataset.completed === 'true');
-                    });
-                });
-
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        deleteTodo(this.dataset.id);
-                    });
-                });
-
+                attachEventListeners();
                 updatePagination(data);
             })
             .catch(error => console.error('Error fetching to-dos:', error));
     }
 
+    // Attach event listeners to buttons
+    function attachEventListeners() {
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                toggleTodo(this.dataset.id, this.dataset.completed === 'true');
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                deleteTodo(this.dataset.id);
+            });
+        });
+    }
+
     // Toggle the completion status of a to-do item
     function toggleTodo(todoId, isCompleted) {
+
         fetch(`${apiBaseUrl}${todoId}/`, {
-            method: 'PATCH', // Use PATCH for partial updates
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken(),
             },
-            body: JSON.stringify({ completed: !isCompleted }), // Toggle the completed status
+            body: JSON.stringify({ completed: !isCompleted }),
         })
             .then(response => {
                 if (!response.ok) {
@@ -77,8 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 return response.json();
             })
-            .then(() => {
-                fetchTodos(currentPage); // Refresh the to-do list
+            .then(data => {
+                fetchTodos(currentPage);
             })
             .catch(error => console.error('Error toggling to-do:', error));
     }
@@ -95,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) {
                     throw new Error('Failed to delete to-do');
                 }
-                fetchTodos(currentPage); // Refresh the to-do list
+                fetchTodos(currentPage);
             })
             .catch(error => console.error('Error deleting to-do:', error));
     }
@@ -152,6 +157,5 @@ document.addEventListener('DOMContentLoaded', function () {
         paginationNav.appendChild(paginationList);
     }
 
-    // Initial fetch of to-do items
     fetchTodos();
 });

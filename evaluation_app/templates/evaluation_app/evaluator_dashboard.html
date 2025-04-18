@@ -48,7 +48,7 @@
         <nav>
             <ul class="pagination">
                 {% if evaluations.has_previous %}
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}">First</a>
                 </li>
                 <li class="page-item">
@@ -72,7 +72,7 @@
                 <li class="page-item">
                     <a class="page-link" href="?page={{ evaluations.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
                 </li>
-                <li class="page-item">
+                <li class="page-item d-none d-md-table-cell">
                     <a class="page-link" href="?page={{ evaluations.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Last</a>
                 </li>
                 {% endif %}

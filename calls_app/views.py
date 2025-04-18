@@ -126,6 +126,7 @@ class GrantCallCreateView(LoginRequiredMixin, CreateView):
 
         return self.form_invalid(form)
 
+
 # Grant Call Detail View
 class GrantCallDetailView(DetailView):
     model = GrantCall

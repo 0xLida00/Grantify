@@ -1,22 +1,35 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const deleteModal = document.getElementById('deleteModal');
-    const faqQuestion = document.getElementById('faqQuestion');
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+document.addEventListener("DOMContentLoaded", function () {
+    const deleteFaqModal = $("#deleteModal");
+    const deleteFaqForm = document.getElementById("deleteFaqForm");
 
-    deleteModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget; // Button that triggered the modal
-        console.log('Modal triggered:', button); // Debugging
+    if (!deleteFaqModal || !deleteFaqForm) {
+        console.error("Modal or form not found.");
+        return;
+    }
 
-        const faqId = button.getAttribute('data-id'); // Get the FAQ ID
-        const question = button.getAttribute('data-question'); // Get the FAQ question
+    // Handle the modal show event
+    deleteFaqModal.on("show.bs.modal", function (event) {
+        const button = $(event.relatedTarget);
 
-        console.log('FAQ ID:', faqId); // Debugging
-        console.log('FAQ Question:', question); // Debugging
+        if (!button) {
+            console.error("No related button found for modal.");
+            return;
+        }
 
-        // Update the modal content
-        faqQuestion.textContent = question;
+        const faqUrl = button.data("faq-url");
+        const faqQuestion = button.data("faq-question");
 
-        // Set the delete link dynamically
-        confirmDeleteBtn.href = `/admin-panel/faqs/${faqId}/delete/`; // Replace with your delete URL pattern
+        if (!faqUrl) {
+            console.error("FAQ URL is missing in button attributes.");
+            return;
+        }
+
+        deleteFaqForm.setAttribute("action", faqUrl);
+
+        // Update the modal content with the FAQ question
+        const faqQuestionElement = document.getElementById("faqQuestion");
+        if (faqQuestionElement) {
+            faqQuestionElement.textContent = faqQuestion || "No question provided.";
+        }
     });
 });
