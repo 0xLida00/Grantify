@@ -140,7 +140,9 @@ WSGI_APPLICATION = 'Grantify_Project.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}", conn_max_age=600)
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}", conn_max_age=600
+    )
 }
 
 # Force PostgreSQL in production (Render)
@@ -206,14 +208,16 @@ IS_PRODUCTION = os.getenv("DJANGO_PRODUCTION", "False") == "True"
 
 if IS_PRODUCTION:
     CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'your-default-cloud-name'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY', 'your-default-api-key'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', 'your-default-api-secret'),
     }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+# Secure proxy SSL header for Render
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 LOGGING = {
     'version': 1,
