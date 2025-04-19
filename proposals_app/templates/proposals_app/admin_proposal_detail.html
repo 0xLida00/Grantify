@@ -34,7 +34,7 @@
         <div class="card-body">
             <p><strong>{{ response.question.question_text }}</strong></p>
             {% if response.file %}
-                <a href="{{ response.file.url }}?attachment=true" target="_blank">Download File</a>
+                <a href="{{ response.file.url }}?fl_attachment={{ response.file.name }}" target="_blank">Download File</a>
             {% else %}
                 <p>{{ response.response }}</p>
             {% endif %}

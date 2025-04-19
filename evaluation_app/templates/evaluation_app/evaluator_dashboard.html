@@ -11,7 +11,7 @@
             <tr>
                 <th>Proposal</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th class="d-none d-md-table-cell">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +27,7 @@
                         {{ evaluation.get_status_display }}
                     </span>
                 </td>
-                <td>
+                <td class="d-none d-md-table-cell">
                     {% if evaluation.status == 'pending' or evaluation.status == 'in_progress' %}
                     <a href="{% url 'submit_evaluation' evaluation.pk %}" class="btn btn-primary btn-sm">Evaluate</a>
                     {% else %}

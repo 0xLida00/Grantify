@@ -28,29 +28,20 @@
         </div>
     </div>
 
-    <!-- Application Form (Read-Only) -->
-    <div class="card shadow-sm">
+    <!-- Responses -->
+    <h3 class="mt-4">Responses</h3>
+    {% for response in responses %}
+    <div class="card mb-3">
         <div class="card-body">
-            <h5 class="card-title">Application Form</h5>
-            <hr>
-            {% for field in form %}
-            <div class="mb-4">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {% if field.widget.input_type == "file" %}
-                <div class="form-control">
-                    {% if field.value %}
-                        <a href="{{ field.value.url }}?attachment=true" target="_blank">Download File</a>
-                    {% else %}
-                        No file uploaded.
-                    {% endif %}
-                </div>
-                {% else %}
-                {{ field|add:" disabled" }}
-                {% endif %}
-            </div>
-            {% endfor %}
+            <p><strong>{{ response.question.question_text }}</strong></p>
+            {% if response.file %}
+                <a href="{{ response.file.url }}?fl_attachment={{ response.file.name }}" target="_blank">Download File</a>
+            {% else %}
+                <p>{{ response.response }}</p>
+            {% endif %}
         </div>
     </div>
+    {% endfor %}
 
     <a href="{% url 'proposals_app:proposal_list' %}" class="btn btn-secondary mt-4">Back to List</a>
 </div>

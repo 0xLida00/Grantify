@@ -204,12 +204,15 @@ def proposal_detail(request, pk):
     grant_call = proposal.grant_call
     questions = grant_call.questions.all()
 
+    responses = GrantResponse.objects.filter(
+        grant_call=grant_call,
+        user=request.user
+    )
+
     initial_data = {}
     for question in questions:
         try:
-            response = GrantResponse.objects.get(
-                question=question, user=request.user, grant_call=grant_call
-            )
+            response = responses.get(question=question)
             initial_data[f'question_{question.id}_response'] = response.response
             initial_data[f'question_{question.id}_file'] = response.file
         except GrantResponse.DoesNotExist:
@@ -221,4 +224,5 @@ def proposal_detail(request, pk):
         'proposal': proposal,
         'grant_call': grant_call,
         'form': form,
+        'responses': responses,
     })
