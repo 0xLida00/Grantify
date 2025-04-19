@@ -202,16 +202,23 @@ def proposal_detail(request, pk):
         return HttpResponseForbidden("You are not allowed to view this proposal.")
 
     grant_call = proposal.grant_call
+    questions = grant_call.questions.all()
+
     responses = GrantResponse.objects.filter(
         grant_call=grant_call,
         user=request.user
     )
 
-    for response in responses:
-        if response.file:
-            response.raw_file_url = response.file.url.replace('/image/upload/', '/raw/upload/')
+    initial_data = {}
+    for question in questions:
+        try:
+            response = responses.get(question=question)
+            initial_data[f'question_{question.id}_response'] = response.response
+            initial_data[f'question_{question.id}_file'] = response.file
+        except GrantResponse.DoesNotExist:
+            pass
 
-    form = ApplicationForm(questions=grant_call.questions.all())
+    form = ApplicationForm(questions=questions, initial=initial_data)
 
     return render(request, 'proposals_app/proposal_detail.html', {
         'proposal': proposal,
