@@ -39,7 +39,7 @@ class CustomUser(AbstractUser):
     def get_profile_picture_url(self):
         if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
             return self.profile_picture.url + "?c_fill,g_face,h_300,w_300"
-        return f"{settings.MEDIA_URL}profile_pics/default.png"
+        return settings.STATIC_URL + "img/default.png"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
