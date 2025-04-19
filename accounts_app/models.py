@@ -1,9 +1,8 @@
 # accounts_app/models.py
 from django.conf import settings
-from django.core.files.storage import default_storage
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from PIL import Image, UnidentifiedImageError
+import cloudinary.uploader
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,29 +35,45 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-    def get_profile_picture_url(self):
-        if self.profile_picture and self.profile_picture.storage.exists(self.profile_picture.name):
-            return self.profile_picture.url + "?c_fill,g_face,h_300,w_300"
-        return settings.STATIC_URL + "img/default.png"
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.profile_picture:
+        if self.profile_picture and not self.profile_picture.name.startswith("http"):
             try:
-                if isinstance(self.profile_picture.storage, default_storage.__class__):
-                    if self.profile_picture.storage.exists(self.profile_picture.name):
-                        img_path = self.profile_picture.path
-                        with Image.open(img_path) as img:
-                            if img.height > 300 or img.width > 300:
-                                img.thumbnail((300, 300))
-                                img.save(img_path)
+                upload_result = cloudinary.uploader.upload(
+                    self.profile_picture.file,
+                    folder="profile_pics/",
+                    public_id=f"profile_pics/{self.username}_profile_picture",
+                    overwrite=True,
+                    resource_type="image"
+                )
+                self.profile_picture.name = upload_result["secure_url"]
             except Exception as e:
-                logger.error(f"Error processing profile picture: {e}")
+                logger.error(f"Error uploading profile picture to Cloudinary: {e}")
+                raise ValueError("Failed to upload profile picture to Cloudinary.")
+
+        super().save(*args, **kwargs)
 
 
 class MyModel(models.Model):
     name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.image and not self.image.name.startswith("http"):
+            try:
+                upload_result = cloudinary.uploader.upload(
+                    self.image.file,
+                    folder="images/",
+                    public_id=f"images/{self.name}_image",
+                    overwrite=True,
+                    resource_type="image"
+                )
+                self.image.name = upload_result["secure_url"]
+            except Exception as e:
+                logger.error(f"Error uploading image to Cloudinary: {e}")
+                raise ValueError("Failed to upload image to Cloudinary.")
+
+        super().save(*args, **kwargs)

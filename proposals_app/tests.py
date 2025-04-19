@@ -73,6 +73,11 @@ class ProposalsAppTests(TestCase):
         response = self.client.get(reverse('proposals_app:proposal_detail', args=[self.proposal1.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Proposal 1")
+        self.assertContains(response, "Test Description")
+        self.assertContains(response, "Test Question")
+        self.assertContains(response, "Test Response")
+        if self.response.file:
+            self.assertContains(response, "Download File")
 
     def test_proposal_detail_view_non_owner(self):
         self.client.login(username='evaluator', password='password')
