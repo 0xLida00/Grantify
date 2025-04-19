@@ -52,12 +52,8 @@ class CustomUser(AbstractUser):
                             if img.height > 300 or img.width > 300:
                                 img.thumbnail((300, 300))
                                 img.save(img_path)
-            except FileNotFoundError:
-                logger.error(f"Profile picture file not found: {self.profile_picture.name}")
-            except UnidentifiedImageError:
-                logger.error(f"Invalid image file: {self.profile_picture.name}")
-            except OSError as e:
-                logger.error(f"OS error while processing profile picture: {e}")
+            except Exception as e:
+                logger.error(f"Error processing profile picture: {e}")
 
 
 class MyModel(models.Model):

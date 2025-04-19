@@ -7,7 +7,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="text-center mb-4">
-        {% if user.profile_picture and user.profile_picture.url %}
+        {% if user.get_profile_picture_url %}
             <img class="rounded-circle account-img mb-3" 
                  src="{{ user.get_profile_picture_url }}" 
                  alt="Profile Image" width="150" height="150">

@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -7,6 +8,8 @@ from django.urls import reverse_lazy
 from audit_app.models import LogEntry
 from .forms import CustomSignupForm, ProfileUpdateForm, UserUpdateForm, CustomPasswordChangeForm
 from .models import CustomUser
+
+logger = logging.getLogger(__name__)
 
 
 def signup(request):
@@ -50,22 +53,26 @@ def user_login(request):
         next_url = request.POST.get('next') or next_url
         user = authenticate(request, username=username, password=password)
         if user:
-            login(request, user)
+            try:
+                login(request, user)
 
-            LogEntry.objects.create(
-                user=user,
-                action="User Logged In",
-                object_repr=str(user),
-                change_message=f"User '{user.username}' logged in successfully.",
-                log_level="INFO",
-                source="User",
-            )
+                LogEntry.objects.create(
+                    user=user,
+                    action="User Logged In",
+                    object_repr=str(user),
+                    change_message=f"User '{user.username}' logged in successfully.",
+                    log_level="INFO",
+                    source="User",
+                )
 
-            messages.success(request, "You have been logged in.")
+                messages.success(request, "You have been logged in.")
 
-            if next_url:
-                return redirect(next_url)
-            return redirect('home')
+                if next_url:
+                    return redirect(next_url)
+                return redirect('home')
+            except Exception as e:
+                logger.error(f"Error during login: {e}")
+                messages.error(request, "An error occurred during login. Please try again.")
         else:
             error_message = "Invalid username or password!"
 
@@ -101,27 +108,30 @@ def profile(request, username):
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
         if u_form.is_valid() and p_form.is_valid():
-            u_form.save()
-            p_form.save()
+            try:
+                u_form.save()
+                p_form.save()
 
-            LogEntry.objects.create(
-                user=request.user,
-                action="Profile Updated",
-                object_repr=str(request.user),
-                change_message=f"User '{request.user.username}' updated their profile.",
-                log_level="INFO",
-                source="User",
-            )
+                LogEntry.objects.create(
+                    user=request.user,
+                    action="Profile Updated",
+                    object_repr=str(request.user),
+                    change_message=f"User '{request.user.username}' updated their profile.",
+                    log_level="INFO",
+                    source="User",
+                )
 
-            Notification.objects.create(
-                user=request.user,
-                notification_type="in_app",
-                message="Your profile has been updated successfully.",
-                is_read=False,
-            )
+                Notification.objects.create(
+                    user=request.user,
+                    notification_type="in_app",
+                    message="Your profile has been updated successfully.",
+                    is_read=False,
+                )
 
-            messages.success(request, "Profile updated successfully.")
-            return redirect('profile', username=request.user.username)
+                messages.success(request, "Profile updated successfully.")
+                return redirect('profile', username=request.user.username)
+            except Exception as e:
+                messages.error(request, f"An error occurred: {e}")
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user)
