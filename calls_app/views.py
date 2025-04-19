@@ -137,6 +137,16 @@ class GrantCallDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         grant_call = self.get_object()
         context["questions"] = grant_call.questions.all()
+
+        if self.request.user.is_authenticated and self.request.user.role == 'applicant':
+            context["has_applied"] = Proposal.objects.filter(
+                grant_call=grant_call,
+                applicant=self.request.user,
+                status="submitted"
+            ).exists()
+        else:
+            context["has_applied"] = False
+
         return context
 
 

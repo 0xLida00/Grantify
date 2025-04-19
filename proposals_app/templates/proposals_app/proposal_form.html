@@ -41,7 +41,7 @@
                     {% if field.widget.input_type == "file" %}
                     <div class="form-control">
                         {% if field.value %}
-                            <a href="{{ field.value.url }}" target="_blank">Download File</a>
+                            <a href="{{ field.value.url }}?attachment=true" target="_blank">Download File</a>
                         {% endif %}
                         {{ field }}
                     </div>

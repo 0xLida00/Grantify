@@ -68,7 +68,7 @@
                         <input type="hidden" name="proposal_id" value="{{ proposal.id }}">
                         <select name="evaluator_id" class="form-control form-control-sm d-inline w-auto" 
                             {% if proposal.status == 'draft' %}disabled{% endif %}>
-                            <option value="">Assign/Reassign Evaluator</option>
+                            <option value="">Assign/Reassign</option>
                             {% for evaluator in evaluators %}
                             <option value="{{ evaluator.id }}" {% if proposal.evaluator and proposal.evaluator.id == evaluator.id %}selected{% endif %}>
                                 {{ evaluator.username }}

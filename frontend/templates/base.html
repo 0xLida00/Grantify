@@ -133,6 +133,12 @@
                                     <i class='bx bx-file icon'></i>
                                     <span class="text nav-text">My Proposals</span>
                                 </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'todo_list' %}">
+                                    <i class='bx bx-task icon'></i>
+                                    <span class="text nav-text">To-Do List</span>
+                                </a>
                             </li>                                
                         {% else %}
                             <li>
@@ -146,7 +152,7 @@
                     {% if user.role == 'evaluator' %}
                         <li>
                             <a href="{% url 'evaluator_dashboard' %}">
-                                <i class='bx bx-check-double icon'></i>
+                                <i class='bx bx-check icon'></i>
                                 <span class="text nav-text">My Evaluations</span>
                             </a>
                         </li>
@@ -155,14 +161,8 @@
                     {% if user.role == 'applicant' or user.role == 'evaluator' %}
                         <li>
                             <a href="{% url 'user_ticket_list' %}">
-                                <i class='bx bx-support icon'></i>
+                                <i class='bx bx-edit icon'></i>
                                 <span class="text nav-text">My Tickets</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'todo_list' %}">
-                                <i class='bx bx-task icon'></i>
-                                <span class="text nav-text">To-Do List</span>
                             </a>
                         </li>
                     {% endif %}

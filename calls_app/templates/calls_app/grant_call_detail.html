@@ -15,6 +15,7 @@
                 {% for criterion in grant_call.eligibility.splitlines %}
                 <li>{{ criterion }}</li>
                 {% endfor %}
+            <br>
             <p><strong>Budget:</strong> ${{ grant_call.budget }}</p>
             <p><strong>Status:</strong> 
                 <span class="badge 
@@ -47,11 +48,15 @@
     <div class="d-flex justify-content-center">
         {% if user.is_authenticated %}
             {% if user.role == 'applicant' and grant_call.status == 'open' %}
-            <a href="{% url 'apply_grant_call' grant_call.pk %}" class="btn btn-success mx-2">Apply</a>
+                {% if has_applied %}
+                    <button class="btn btn-secondary mx-2" disabled>You have already applied</button>
+                {% else %}
+                    <a href="{% url 'apply_grant_call' grant_call.pk %}" class="btn btn-success mx-2">Apply</a>
+                {% endif %}
             {% endif %}
             {% if user.role == 'admin' or user.role == 'org' %}
-            <a href="{% url 'grant_call_update' grant_call.pk %}" class="btn btn-warning mx-2">Edit</a>
-            <a href="{% url 'grant_call_delete' grant_call.pk %}" class="btn btn-danger mx-2">Delete</a>
+                <a href="{% url 'grant_call_update' grant_call.pk %}" class="btn btn-warning mx-2">Edit</a>
+                <a href="{% url 'grant_call_delete' grant_call.pk %}" class="btn btn-danger mx-2">Delete</a>
             {% endif %}
         {% endif %}
         <a href="{% url 'grant_call_list' %}" class="btn btn-secondary mx-2">Back</a>
